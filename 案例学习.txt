@@ -1,0 +1,7 @@
+https://github.com/cube-ui/cube-application-guide
+
+
+<avatar username="鹏哥"
+          src="../../assets/user.jpeg"
+          :size="45">
+         </avatar>

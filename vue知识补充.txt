@@ -1,0 +1,321 @@
+1, vue ref 作用
+1.1 获取dom元素
+<template>
+  <div id="app">
+    <div ref="testDom">11111</div>
+    <button @click="getTest">获取test节点</button>
+  </div>
+</template>
+
+<script>
+export default {
+  methods: {
+    getTest() {
+      console.log(this.$refs.testDom)
+    }
+  }
+};
+</script>
+
+
+
+1.2 获取子组件中的data
+
+子组件：
+<template>
+  <div>
+      {{ msg }}
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      msg: "hello world"
+    }
+  }
+}
+</script>
+
+父组件：
+<template>
+  <div id="app">
+    <HelloWorld ref="hello"/>
+    <button @click="getHello">获取helloworld组件中的值</button>
+  </div>
+</template>
+
+<script>
+import HelloWorld from "./components/HelloWorld.vue";
+
+export default {
+  components: {
+    HelloWorld
+  },
+  data() {
+    return {}
+  },
+  methods: {
+    getHello() {
+      console.log(this.$refs.hello.msg)
+    }
+  }
+};
+</script>
+
+
+1.3 调用子组件中的方法
+
+子组件
+
+<template>
+  <div>
+  </div>
+</template>
+
+<script>
+export default {
+  methods: {
+    open() {
+      console.log("调用到了")
+    }
+  }
+}
+</script>
+父组件：
+
+<template>
+  <div id="app">
+    <HelloWorld ref="hello"/>
+    <button @click="getHello">调用子组件helloworld的open()方法</button>
+  </div>
+</template>
+
+<script>
+import HelloWorld from "./components/HelloWorld.vue";
+
+export default {
+  components: {
+    HelloWorld
+  },
+  data() {
+    return {}
+  },
+  methods: {
+    getHello() {
+      this.$refs.hello.open();
+    }
+  }
+};
+</script>
+
+1.4 子组件调用父组件方法
+
+子组件
+
+<template>
+  <div>
+</div>
+</template>
+
+<script>
+export default {
+  methods: {
+    open() {
+      console.log("调用了");
+      //  调用父组件方法
+      this.$emit("refreshData");
+    }
+  }
+}
+</script>
+
+父组件
+
+
+<template>
+  <div id="app">
+    <HelloWorld ref="hello" @refreshData="getData"/>
+    <button @click="getHello">获取helloworld组件中的值</button>
+  </div>
+</template>
+
+<script>
+import HelloWorld from "./components/HelloWorld.vue";
+
+export default {
+  components: {
+    HelloWorld
+  },
+  data() {
+    return {}
+  },
+  methods: {
+    getHello() {
+      this.$refs.hello.open()
+    },
+    getData() {
+      console.log('111111')
+    }
+  }
+};
+</script>
+
+
+2, mixins 用法
+
+mixins就是定义一部分公共的方法或者计算属性,然后混入到各个组件中使用,方便管理与统一修改
+
+
+3, export default function 和 export function 
+
+// 第一组
+export default function crc32() {}; // 输出
+import crc32 from 'crc32'; // 输入
+ 
+// 第二组
+export function crc32() {}; // 输出
+import {crc32} from 'crc32'; // 输入
+第一组是使用 export default 时，对应的 import 语句不需要使用大括号。
+第二组是不使用 export default 时，对应的 import 语句需要使用大括号。
+
+
+4, axios Ajax请求
+(1) get 
+axios.get('/user')
+    .then( (response) => {
+        console.log(response);
+    })
+    .catch( (error) => {
+        console.log(error);
+    });
+
+(2) get拼接参数
+axios.get('/user?ID=12345')
+.then( (response) => {
+    console.log(response);
+})
+.catch( (error) => {
+    console.log(error);
+});
+
+(3) get 带键-值参数
+axios.get('/user', {
+    params: {
+        ID: 12345
+    }
+})
+.then( (response) => {
+    console.log(response);
+})
+.catch( (error) => {
+    console.log(error);
+});
+
+(4) post请求
+axios.post('/user', {
+    firstName: 'Fred',
+    lastName: 'Flintstone'
+})
+.then( (response) => {
+    console.log(response);
+})
+.catch( (error) => {
+    console.log(error);
+});
+
+
+（5） axios的post请求与get请求封装在一起利用的是axios(config)
+
+GET请求：
+
+axios({
+    methods: 'get',
+    url: '/user',
+    params: {
+        ID: '1234'
+    }
+})
+.then( (response) => {
+    console.log(response);
+})
+.catch( (error) => {
+    console.log(error);
+});
+
+POST 请求
+
+axios({
+    methods: 'post',
+    url: '/user',
+    data: {
+        ID: '1234'
+    }
+})
+.then( (response) => {
+    console.log(response);
+})
+.catch( (error) => {
+    console.log(error);
+});
+
+定义一个通用的AJAX函数
+
+import axios from 'axios';
+
+export default function req(url, method, params = {}) {
+    // 首先判断是get请求还是post请求
+    let data = method.toLocaleLowerCase() === 'get' ? 'params' : 'data';
+    return axios({
+        method,
+        url,
+        [data]: params // 差异点在于data的值
+    }).then((res) => {
+        return Promise.resolve(res.data);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+
+5,组件传值
+
+(1) npm install vue-bus --save
+
+import VueBus from 'vue-bus';
+
+Vue.use(VueBus);
+
+//调用cart.vue组件中的this.$bus.on('cartChage',..)事件
+
+ myDialog.vue
+ this.$bus.emit('cartChange',params);
+ 
+ cart.vue 中监听事件cartChage
+ 
+  created(){
+              // 监听来自myDialog.vue中加入购物车动作事件，由$emit发出 
+             this.$bus.on('cartChange', (val) => {
+               //让购物车中的商品及时更新
+              this.cartList=JSON.parse(localStorage.getItem("cartList"));
+                
+             });
+       
+       }
+6, cube-ui 出现click事件执行两次的情况，如何修复这个BUG? 
+
+node_modules/cube-ui/src/components/scroll/scroll.vue
+将 click: true改为: click: false
+const DEFAULT_OPTIONS = {
+    observeDOM: true,
+    click: false,
+    probeType: 1,
+    scrollbar: false,
+    pullDownRefresh: false,
+    pullUpLoad: false
+  }
+
+
+
+
+

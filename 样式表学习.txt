@@ -1,0 +1,32 @@
+1, display:flex 是一种布局方式。
+它即可以应用于容器中，也可以应用于行内元素。是W3C提出的一种新的方案，可以简便、完整、响应式地实现各种页面布局。
+(1) flex-direction:row; 默认横向排列沿水平主轴让元素从左向右排列
+(2) flex-direction:column; 让元素沿垂直主轴从上到下垂直排列
+(3) flex-direction:row-reverse;沿水平主轴让元素从右向左排列
+(4) flex-wrap 容器内元素的换行(默认不换行)
+4.1：flex-wrap: nowrap; (默认)元素不换行,比如：一个div宽度100%，设置此属性，2个div宽度就自动变成各50%；
+4.2：flex-wrap: wrap; 元素换行,比如：一个div宽度100%，设置此属性，第二个div就在第二行了；
+
+(5)justify-content 元素在主轴（页面）上的排列
+5.1 justify-content : center;元素在主轴（页面）上居中排列
+5.2 justify-content : flex-start;元素在主轴（页面）上由左或者上开始排列
+5.3 justify-content : flex-end;元素在主轴（页面）上由右或者下开始排列
+5.4 justify-content : space-between;元素在主轴（页面）上左右两端或者上下两端开始排列
+
+5.5 justify-content : space-around;每个元素两侧的间隔相等。所以，元素之间的间隔比元素与边框的间隔大一倍。
+
+其他：参考： https://www.jianshu.com/p/d9373a86b748/
+
+2, align-items: stretch|center|flex-start|flex-end|baseline|initial|inherit;
+3,linear-gradient()用法 
+
+CSS linear-gradient() 函数用于创建一个表示两种或多种颜色线性渐变的图片。其结果属于<gradient>数据类型，是一种特别的<image>数据类型。
+
+/* 渐变轴为45度，从蓝色渐变到红色 */
+linear-gradient(45deg, blue, red);
+
+/* 从右下到左上、从蓝色渐变到红色 */
+linear-gradient(to left top, blue, red);
+
+/* 从下到上，从蓝色开始渐变、到高度40%位置是绿色渐变开始、最后以红色结束 */
+linear-gradient(0deg, blue, green 40%, red);

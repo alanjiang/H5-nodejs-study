@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>glMatrix</title>
+    
+    <style>
+    
+  .test02 
+    { 
+        border: 1px solid gray;
+        display: flex;
+        width:400px;
+        flex-direction: row;
+        height:60px;
+        overflow:scroll;
+      }
+.test02 .children
+{ 
+   width: 120px; 
+   height: 60px; 
+   background:red;
+   margin:3px;
+   text-align:center;
+   display: flex;
+   overflow:hidden;
+}
+   
+ .children .avatar{
+    
+    width: 50px;
+    height: 50px;
+    background: blue;
+    color:#fff;
+    display:inline-flex;
+    flex-wrap: nowrap;
+    align-items:center;
+    justify-content:center ;
+    margin:2px;
+ }
+    
+    </style>
+  </head>
+  <body>
+  <p>
+  
+  <h2>
+   flex-direction: row | row-reverse | column | column-reverse;
+  </h2>
+  
+  Flex是Flexible Box的缩写，意为"弹性布局"，用来为盒状模型提供最大的灵活性。
+  任何一个容器都可以指定为 Flex 布局，行内元素也可以通过 inline-flex 使属性值用 Flex 布局。
+
+  inline-flex 和 inline-block 一样，对设置了该属性值的元素的子元素来说是个 display:flex 的容器，
+  
+  对外部元素来说是个 inline 的块。
+  设为 Flex 布局以后，子元素的float、clear和vertical-align属性将失效。
+  </p>
+  
+  <div class="test02">
+    <div class="children">
+       <div class="avatar">Hello</div>
+        <div class="avatar">Hello</div>
+    </div>
+    <div class="children">
+      <p>2ccccccccccccccccccccccccccccccccccccc</p>
+    </div>
+    <div class="children"> 
+      <p>3</p>
+    </div>
+</div>
+   
+    
+  </body>
+</html>

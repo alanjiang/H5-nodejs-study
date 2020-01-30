@@ -1,6 +1,4 @@
-# dian-cube-ui
 
-> dian cube ui
 
 ## Build Setup
 
@@ -23,7 +21,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 
 难点问题：
 
-1， cube-scroll引用了 better-scroll ,  点击事件出现次：
+1， 引用了 better-scroll ,  点击事件出现次：
 
     node_modules/scroll.vue
     新增：stopPropagation: true
@@ -37,10 +35,3 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
     pullUpLoad: false,
     stopPropagation: true
   }
-
-
-
-
-
-<cube-scroll-nav-bar :current="current" :labels="labels" @change="changeHandler" />
-.

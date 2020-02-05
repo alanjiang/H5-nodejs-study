@@ -6,11 +6,27 @@
     <div class="my" v-show="visible">
     
          <div class="order-current">
-             Hello
+             为您呈上近期三个月内在本门店的消费定单
          </div>
          <div class="order-history">
          
-            History Orders
+            <div class="order-detail">
+             
+                <a href="#" class="title"> 订单号：201909011209120986 </a>
+                <span class="price"> ¥126.00</span>
+                 <span class="status">已付款</span>
+                 
+            </div>
+            <div class="split"></div>
+            
+             <div class="order-detail">
+             
+                <span class="title"> 订单号：202001011209120909</span>
+                <span class="price"> ¥312.00</span>
+                 <span class="status">已付款</span>
+            
+            </div>
+            
          
          </div>
     
@@ -105,7 +121,31 @@
       padding:5px
       background-color:$color-white
       border-radius: 10px
-       
+      .order-detail
+      
+        position: relative
+        padding: 5px 15px
+        display: flex
+        flex-direction: row
+        vertical-align: middle
+        .title
+          width:150px
+          height:45px
+          display: inline-block
+          font-size: $fontsize-medium
+          color: $color-dark-grey
+        .price
+           height:45px
+           margin-right:auto
+           display: inline-block
+           font-size: $fontsize-medium
+           color: $color-light-grey
+        .status
+          height:45px
+          display: inline-block
+          font-size: $fontsize-large
+          color: $color-dark-orange 
+          
   .back
         position: absolute
         top: 10px
@@ -116,5 +156,9 @@
           font-size: $fontsize-large-xx
           color: $color-dark-orange
 
- 
+ .split
+      height:1px
+      margin-left:10px
+      margin-right:10px
+      border-bottom: 1px dashed #F2F2F2
 </style>

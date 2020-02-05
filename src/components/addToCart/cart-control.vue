@@ -12,8 +12,8 @@
 </template>
 
 <script>
-  const EVENT_ADD = 'add'
-
+  const EVENT_ADD = 'add';
+  import { setGlobal,getGlobal,removeGlobal } from '../../api'
   export default {
     name: 'cart-control',
     props: {
@@ -22,28 +22,78 @@
       }
     },
     methods: {
+      //加商品到购物车的动作
       addToCart(event) {
-    
-        if (!this.food.count) {
-          
-          this.$set(this.food, 'count', 1)
+          //让Goods.vue父组件来执行新增动作
+          this.$emit(EVENT_ADD, event.target, this.food,'cart-control')
+        /*
+        alert('=>parent:'+JSON.stringify(this.$parent));
+        if (this.food.attrs.length >= 1){ 
+               
+                 //this.selectFood();
+                
+        }else //没有规格的商品直接数量累加
+        {
+               if (!this.food.count) {
+                 //this.#set(obj, key, value) 为对象添加一个属性
+                 this.$set(this.food, 'count', 1)
+               }else {
+                  this.food.count++
+               }
+               
+               //向父组件通讯
+              if(event){
+                 this.$emit(EVENT_ADD, event.target, this.food)
+              }
+         } */
          
-        } else {
-          this.food.count++
-        }
-       
-        //向父组件通讯
-        if(event){
-          this.$emit(EVENT_ADD, event.target)
-        }
-         
+           
       },
       decrease() {
-        if (this.food.count) {
-          this.food.count--
-        }
+         if (this.food.count) {
+            this.food.count--
+          }
+      },
+        
+         // start 商品有规格，显示商品详情页面 
+         selectFood() {
+            
+            this.showFood()
+            this.showShopCartSticky()
+         },
        
+      showFood() {
+        this.foodComp = this.foodComp || this.$createFood({
+          $props: {
+            food: 'food'
+          },
+          $events: {
+            add: (target) => {
+              this.shopCartStickyComp.drop(target);
+            },
+            leave: () => {
+              this.hideShopCartSticky();
+            
+            }
+          }
+        })
+        this.foodComp.show()
+      },
+      //createAPI
+      showShopCartSticky() {
+        this.shopCartStickyComp = this.shopCartStickyComp || this.$createShopCartSticky({
+          $props: {
+            selectFoods: 'selectFoods',
+            fold: true
+          }
+        })
+        this.shopCartStickyComp.show()
+      },
+      hideShopCartSticky() {
+        this.shopCartStickyComp.hide()
       }
+         // end 商品有规格，显示商品详情页面 
+      
     }
   }
 </script>

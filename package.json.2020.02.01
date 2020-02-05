@@ -18,11 +18,12 @@
   },
   "dependencies": {
     "amfe-flexible": "^2.2.1",
-    "better-scroll": "^1.15.2",
-    "cube-ui": "^1.12.34",
+    "build": "^0.1.4",
+    "cube-ui": "^1.12.0",
     "good-storage": "^1.1.0",
     "moment": "^2.24.0",
     "vue": "^2.6.6",
+    "vue-avatar": "^2.1.8",
     "vue-bus": "^1.2.1",
     "vue-router": "^3.0.1"
   },

@@ -4,7 +4,7 @@
       <div class="overview">
         <h1 class="title">XXX</h1>
         <div class="desc border-bottom-1px">
-          <star :size="36" score="12"></star>
+          <star :size="36" :score=12></star>
           <span class="text">(121)</span>
           <span class="text">月售1200单</span>
         </div>
@@ -39,15 +39,7 @@
         <div class="content-wrapper border-bottom-1px">
           <p class="content">XXXX</p>
         </div>
-        <ul v-if="supports" class="supports">
-          <li
-            class="support-item border-bottom-1px"
-            
-          >
-           
-            <span class="text">ABCDEF</span>
-          </li>
-        </ul>
+        
       </div>
       <split></split>
       <div class="pics">
@@ -81,6 +73,7 @@
 <script>
   import { saveToLocal, loadFromLocal } from '../../common/js/storage'
   import Split from '../split/split'
+  import star from '../star/star'
   export default {
    
     data() {
@@ -106,7 +99,7 @@
     },
     components: {
       
-      Split
+      Split,star
     }
   }
 </script>

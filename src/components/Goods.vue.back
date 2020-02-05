@@ -26,18 +26,18 @@
         
        <cube-scroll-nav-panel
           v-for="good in goods"
-          :key="good.type"
-          :label="good.type"
-          :title="good.type"
+          :key="good.id"
+          :label="good.name"
+          :title="good.name"
         >
           <ul>
             <li
-              v-for="food in good.items"
+              v-for="food in good.foods"
               :key="food.id"
               class="food-item"
             >
               <div class="icon"  @click="selectFood(food)">
-                <img width="57" height="57" :src="food.image">
+                <img width="57" height="57" :src="food.icon">
               </div>
               <div class="content">
                 <h2 class="name"  @click="selectFood(food)">{{food.name}}</h2>
@@ -46,17 +46,11 @@
                   <span class="count">月售12份</span><span>好评率89%</span>
                 </div>
                 <div class="price">
-                  <span class="now" v-if="food.price_span">
-                  ￥{{ food.price_span }}
-                  </span>
-                  <span class="now" v-else>
-                  ￥{{ food.price }}
-                  </span>
-                  
+                  <span class="now">￥12.00</span>
                   
                 </div>
                 <div class="cart-control-wrapper">
-                  <addcart :food="food" @add="onAdd" ></addcart>
+                  <addcart :food="food" @add="onAdd"></addcart>
                 </div>
               </div>
             </li>
@@ -105,17 +99,16 @@ export default {
   data () {
     return {
        goods: [],
-       selectedFood: {},
-       
+       selectedFood: {}
     }
   },
   
   computed: {
-      //{type ,name, count}
+      
       selectFoods() {
-        let foods = []  // 商品选中后,count属性累加
+        let foods = []
         this.goods.forEach((good) => {
-          good.items.forEach((food) => {
+          good.foods.forEach((food) => {
             if (food.count) {
               foods.push(food)
             }
@@ -126,10 +119,7 @@ export default {
       barTxts() {
         let ret = []
         this.goods.forEach((good) => {
-          var foods = good.items;
-          var type = good.type
-          var name = good.type
-          
+          const {type, name, foods} = good
           let count = 0
           foods.forEach((food) => {
             count += food.count || 0
@@ -140,7 +130,6 @@ export default {
             count
           })
         })
-        //console.log('==>ret:'+JSON.stringify(ret));
         return ret
       }
     },
@@ -148,28 +137,6 @@ export default {
   
   
   methods: {
-    
-    // 更新集合[ {'type':'','items':[ {id,name,...count},...{..}]}, ... ]中的items集合对象中的count属性
-    resetFoods(selectedFood){
-          alert('==> selectedFood JSON :'+JSON.stringify(selectedFood));
-          this.goods.forEach(good => {
-          var foods = good.items;
-          var type = good.type
-          var name = good.type
-          for (var i=0;i<foods.length;i++){
-             var food = foods[i]
-             if (selectedFood.id == food.id ){
-                      food.count = selectedFood.count;
-                      alert('==> selectedFood 2 match:'+selectedFood.count);
-                      break;
-            }
-          }
-            good.items = foods;
-        })
-    
-    
-    }, 
-    
     
     _getShopMers(){
       
@@ -182,8 +149,8 @@ export default {
              alert('==>服务器请求未响应，请检查网络环境<==');
              return false;
            }
-           //alert(JSON.stringify(res.data));
-           //console.log(JSON.stringify(res.data));
+           alert(JSON.stringify(res.data));
+           console.log(JSON.stringify(res.data));
            var result =  res.data 
            var sorts = []
            if (result.resCode == '0'){
@@ -193,7 +160,7 @@ export default {
               });
                             
               let types = new Set(sorts)
-             
+              console.log(types)
               /*根据商品的分类来展示商品，需要转换原有的数据结构
               
               "type":"炒面", "items":[
@@ -287,52 +254,34 @@ export default {
            }else{
               alert(result.resMsg);
               
-           }    
+           } 
+          
+           
+            
+           
             
         })
       
       },
     
-
-       //父组件的方法
-      selectFood(food) {
+    
+    
+    //父组件的方法
+    selectFood(food) {
         this.selectedFood = food
-        this.showFood(food)
+        this.showFood()
         this.showShopCartSticky()
       },
       //food.vue中的addFoold事件,this.$emit(EVENT_ADD, target)
-      //监听 cart-controll.vue中的事件
-      onAdd (target,food,type) {
-        
+      onAdd (target) {
         this.$refs.shopCart.drop(target)
-        this.selectedFood = food
-        if (food.attrs.length >= 1 ){
-            if(type == 'cart-control'){
-              this.showFood(food)
-              this.showShopCartSticky()
-            }//不是cart-control发出的事件不再建新的food.vue弹窗
-           
-        }else{//处理没有规格商品的数量
-             
-              if (!this.selectedFood.count) {
-                 //this.$set(obj, key, value) 为对象添加一个属性
-                 this.$set(this.selectedFood, 'count', 1)
-               }else {
-                  this.selectedFood.count++;
-               }
-               //重置 foods集合[{'type':xx,items:[]} ... ] 中mers中的商品对象的count值 
-               this.resetFoods(this.selectedFood);
-              
-        
-        }
-        
       },
       
       //createAPI
-      showFood(food) {
+      showFood() {
         this.foodComp = this.foodComp || this.$createFood({
           $props: {
-            food: food
+            food: 'selectedFood'
           },
           $events: {
             add: (target) => {
@@ -358,8 +307,6 @@ export default {
       hideShopCartSticky() {
         this.shopCartStickyComp.hide()
       }
-      
-      
       
       
       
@@ -476,7 +423,7 @@ export default {
       position: absolute
       left: 0
       bottom: 0
-      z-index: 200
+      z-index: 50
       width: 100%
       height: 48px
       

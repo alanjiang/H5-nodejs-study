@@ -35,3 +35,21 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
     pullUpLoad: false,
     stopPropagation: true
   }
+
+2, babel 兼容 
+  
+  
+
+.babelrc 文件
+
+　　{
+  "presets": [
+    ["env", {
+      "modules": false
+    }],
+    "stage-2"
+  ],
+  "plugins": [
+    "transform-runtime"
+  ]
+}

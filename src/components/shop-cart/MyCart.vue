@@ -259,11 +259,13 @@
 /* 购物车外层、内层小圆圈*/
   .shopcart
     height: 100%
+    z-index: 200
     .content
       display: flex
       background: $color-background
       font-size: 0
       color: $color-light-grey
+      
       .content-left
         flex: 1
         .logo-wrapper
@@ -336,7 +338,7 @@
         position: fixed
         left: 32px
         bottom: 22px
-        z-index: 200
+       
         transition: all 0.4s cubic-bezier(0.49, -0.29, 0.75, 0.41)
         .inner
           width: 16px

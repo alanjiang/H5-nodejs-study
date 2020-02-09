@@ -55,7 +55,7 @@
           },
           $events: {
             add: (target) => {
-               alert('add');
+               
             },
             leave: () => {
               this.showMsg(1000,'阁下离开中...')
@@ -66,12 +66,12 @@
       },
       
       showMsg(ms,msg ) {
-      const toast = this.$createToast({
-        time: ms,
-        txt: msg
-      })
-      toast.show()
-    }
+        const toast = this.$createToast({
+          time: ms,
+          txt: msg
+        })
+        toast.show()
+      }
       
 
      }

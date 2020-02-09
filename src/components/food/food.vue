@@ -31,16 +31,14 @@
             </div>
             <!-- end of  规格  -->
             <div class="price">
-              <span class="now" v-if="food.price_span">￥ {{ food.price_span }} </span>
+              
                <span class="now" v-else>￥ {{ food.price }} </span>
-              <!--
-              <span class="old" v-show="food.oldPrice">￥9.00</span>
-              -->
+             
               
             </div>
             <div class="cart-control-wrapper">
               <!-- +,- 购物车增加、移除商品组件, 监听 cart-control中发出的事件 -->
-              <addcart @add="addFood" :food="food"></addcart>
+              <addcart @add="addFood" :food="food" ></addcart>
             </div>
             <transition name="fade">
               <div @click="addFirst" class="buy" v-show="!food.count">
@@ -51,9 +49,9 @@
           
           
          
-          <div class="info" v-show="food.info">
+          <div class="info" v-show="food.description">
             <h1 class="title">商品信息</h1>
-            <p class="text">CCCCCCCC</p>
+            <p class="text">{{ food.description }}</p>
           </div>
           
           <div class="rating">
@@ -99,14 +97,11 @@
   import Split from '../split/split'
   import ratingMixin from '../../common/mixins/rating'
   import popupMixin from '../../common/mixins/popup'
-
   import ratingsData from '../../datas/ratings_list.json'
   const ratings = ratingsData.ratings
-
   const EVENT_SHOW = 'show'
   const EVENT_ADD = 'add'
   const EVENT_LEAVE = 'leave'
-
   export default {
     name: 'food',
     mixins: [ratingMixin, popupMixin],
@@ -118,20 +113,8 @@
     data() {
       return {
         desc: {
-          all: '全部',positive: '推荐',negative: '吐槽'
-          }, 
-          selected1: -1,
-          selected2: -1,
-          attr_id1: null,
-          attr_id2: null,
-          count: 1,
-          price: 0,
-          total_price: 0,
-          remain: null,
-          product: null,
-          symbol: '',
-          price_span: null,
-          total_price: null
+             all: '全部',positive: '推荐',negative: '吐槽'
+          }
           
         }
        
@@ -147,133 +130,40 @@
           this.$refs.scroll.refresh()
         })
       })
+      
+      
+      
     },
     methods: {
       afterLeave() {
         //用户离开后，清理规格的选择值
-        this.selected1 = -1 ;
-        this.selected2 = -1 ;
-        this.attr_id1 = null;
-        this.attr_id2 = null;
-        this.price_span = null;
-        this.total_price = null;
+        
         this.$emit(EVENT_LEAVE);
       },
       addFirst(event) {
         this.$set(this.food, 'count', 1)
-        this.$emit(EVENT_ADD, event.target,'food')
+        this.$emit(EVENT_ADD, event.target)
       },
-      //点击商品详情后的新增商品到购物车的动作
-      addFood(target,food) {
-        if ( !this.judgeAttrComplete() ){
-           return false;
-        }else{
-           
-           this.$emit(EVENT_ADD, target,food,'food');
-        }
-        
+      //不执行具体的数量加减动作，所有的数量加减均在cart-control.vue addToCart中
+      addFood(target) { 
+          
+           this.$emit(EVENT_ADD, target);
       },
       format(time) {
         return moment(time).format('YYYY-MM-DD hh:mm')
       },
-      
-      //规格有二维时，点击不分先后
-        //选取规格，及时调整单价、总价和库存,规格一维点击了
-        chooseItem1(index,attr_id){
-           this.attr_id1=attr_id;
-           this.selected1=index;
-           
-          if(this.food.attrs.length == 2){
-            //二维已经选择了，需要计算价格,修复当用户先选择二维再选择一维时价格不变的BUG
-             if(this.attr_id2 != null ){
-                 alert('=> attr price:'+JSON.stringify(this.food.mer_attr_price));
-                 var target=this.food.mer_attr_price.find(item=> {
-                 var s1=this.attr_id1+','+this.attr_id2;
-                 var s2=this.attr_id2+','+this.attr_id1;
-                 if( s1 == item.symbol  || s2 == item.symbol){
-                     return true;
-                  }});
-                  if(target != null){
-                     this.price=target.price;
-                     this.remain=target.num;
-                     this.symbol=target.symbol;
-                 }
-             }
-             
-              
-          } 
-          if(this.food.attrs.length == 1){
-              
-             alert('=> attr price:'+JSON.stringify(this.food.mer_attr_price));
-             var target=this.food.mer_attr_price.find(item=> {
-            
-               if( attr_id == item.symbol ){
-                  return true;
-                }
-            });
-             
-             if(target != null){
-                  this.price=target.price;
-                  this.remain=target.num;
-                  this.symbol=target.symbol;
-             }
-             
-             
-          } 
-          
-           this.total_price=this.price*this.count;
-           
-           alert('=>symbole:'+this.symbol+',=> total_price :'+this.total_price);
-        
-        },
-        
-        //规格二维点击了
-        chooseItem2(index,attr_id){ 
-         this.attr_id2=attr_id;
-         this.selected2=index;
-         if(this.attr_id1 == null ) return;
-         var target=this.food.mer_attr_price.find(item=> {
-             var s1=this.attr_id1+','+this.attr_id2;
-             var s2=this.attr_id2+','+this.attr_id1;
-             if( s1 == item.symbol  || s2 == item.symbol){
-                 
-                  return true;
-             }});
-        if(target !=null ){
-           this.price=target.price;
-           this.remain=target.num;
-           this.symbol=target.symbol;
-         }  
-         
-         this.total_price=this.price*this.count;
-         alert('=>symbole:'+this.symbol+',=> total_price :'+this.total_price);
-      },
-      
-      judgeAttrComplete {
-                if(this.food.attrs.length == 2 ){
-                  if(this.attr_id1 ==null  || this.attr_id2 == null){
-                	  
-                	  alert('规格没有全面选择');
-                
-                       return false;
-                  }
-               }
-               if(this.food.attrs.length == 1){
-                   if(this.attr_id1 ==null){
-                     alert('规格没有选择');
-                     return false;
-                  }
-               }
-               return true;
-           }
-      
-      
-      
-      
-      
-      
+     
+       //消息方法    
+       showMsg(ms,msg ) {
+         const toast = this.$createToast({
+           time: ms,
+           txt: msg
+         });
+         toast.show();
+       }
+       
     },
-    
+
      components: {
       addcart,
       RatingSelect,

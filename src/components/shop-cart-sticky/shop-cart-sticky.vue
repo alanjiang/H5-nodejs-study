@@ -1,9 +1,9 @@
 <template>
   <div class="shop-cart-sticky" v-show="visible">
-    <myCart
+    
+    <myCart :key="componetKey"
       ref="shopCart"
       :selectFoods="selectFoods"
-     
       :fold="fold"
       :sticky=true
     >
@@ -44,10 +44,37 @@
         }
       }
     },
+    
+    data () {
+      return {
+         count: this.calcCount(this.selectFoods),
+         componetKey: 0
+      } 
+    },
     methods: {
+    
+      calcCount (col){
+        var count = 0;
+        col.forEach((t)=>{
+           count += t.count;
+        });
+        return count;
+      },
       drop(el) {
         this.$refs.shopCart.drop(el)
+      },
+      update (selectFoods) {
+           
+           this.selectFoods = selectFoods;
+          
+           this.componetKey++; // :key 强制更新组件
       }
+    },
+    
+    created() {
+    
+      
+    
     },
     components: {
       myCart

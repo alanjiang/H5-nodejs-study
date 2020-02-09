@@ -32,7 +32,7 @@
                   <span v-else>￥{{ food.price*food.count }}</span>
                 </div>
                 <div class="cart-control-wrapper">
-                  <cart-control @add="onAdd" :food="food" @handler="onHandler"></cart-control>
+                  <cart-control @add="onAdd" :food="food"></cart-control>
                 </div>
               </li>
             </ul>
@@ -66,26 +66,12 @@
       this.$on(EVENT_SHOW, () => {
         this.$nextTick(() => {
           this.$refs.listContent.refresh()
-        });
-      });
-   
-      
+        })
+      })
     },
-    
     methods: {
-    
-      //处理规格商品专用
-      onHandler(fd) {
-        
-         
-         alert('=>receive from cart-control event:'+JSON.stringify(fd));
-         //通知 Goods.vue, shop-cart-list.vue 更新 goods
-         this.$bus.emit('updateSelectFoods',fd);
-      },
-    
-    
       onAdd(target) {
-        
+          // send event to MyCart.vue
           this.$emit(EVENT_ADD);
         
         
@@ -94,7 +80,6 @@
         this.$emit(EVENT_LEAVE)
       },
       maskClick() {
-        alert('<=maskClick=>');
         this.hide()
       },
       empty() {

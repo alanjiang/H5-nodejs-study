@@ -8,7 +8,7 @@
               <i class="icon-shopping_cart" :class="{'highlight':totalCount>0}"></i>
             </div>
             <div class="num" v-show="totalCount>0">
-              <bubble :num="totalCount" :key="bubbleKey"></bubble>
+              <bubble :num="totalCount"></bubble>
             </div>
           </div>
           <div class="price" :class="{'highlight':totalPrice>0}">￥{{totalPrice}}</div>
@@ -74,24 +74,17 @@
     data() {
       return {
         balls: createBalls(),
-        dropBalls: [],
-        listFold: this.fold,
-        bubbleKey:0
+        listFold: this.fold
       }
     },
     created() {
-      
+      this.dropBalls = []
     },
     computed: {
       totalPrice() {
         let total = 0
         this.selectFoods.forEach((food) => {
-          if(food.attr_price){
-             total += food.attr_price * food.count
-          }else{
-             total += food.price * food.count
-          }
-          
+          total += food.price * food.count
         })
         return total
       },
@@ -114,13 +107,6 @@
       }
     },
     methods: {
-    
-     updateSelectFoods (foods) {
-     
-        this.selectFoods = foods;
-        this.bubbleKey++;// 强制汽泡数值更新
-     },
-    
       toggleList() {
         if (this.listFold) {
           if (!this.totalCount) {
@@ -155,8 +141,6 @@
       },
       beforeDrop(el) {
         const ball = this.dropBalls[this.dropBalls.length - 1]
-        
-        if(ball.el){
         const rect = ball.el.getBoundingClientRect()
         const x = rect.left - 32
         const y = -(window.innerHeight - rect.top - 22)
@@ -164,7 +148,6 @@
         el.style.transform = el.style.webkitTransform = `translate3d(0,${y}px,0)`
         const inner = el.getElementsByClassName(innerClsHook)[0]
         inner.style.transform = inner.style.webkitTransform = `translate3d(${x}px,0,0)`
-        }
       },
       dropping(el, done) {
         this._reflow = document.body.offsetHeight
@@ -227,7 +210,7 @@
           },
           $events: {
             add: (target) => {
-              
+               alert('add');
             },
             leave: () => {
               this.showMsg(1000,'阁下离开中...')
@@ -246,22 +229,16 @@
     },
     
     //end history
-  
+      
+      
+      
+      
     },
-    
-    created () {
-    
-            
-    },
-    
     watch: {
       fold(newVal) {
-      
-        
         this.listFold = newVal
       },
       totalCount(count) {
-        
         if (!this.fold && count === 0) {
           this._hideShopCartList()
         }

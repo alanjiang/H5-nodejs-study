@@ -1,22 +1,22 @@
 <template>
   <div>
     <div class="shopcart">
-      <div class="content">
+      <div class="content" @click="toggleList">
         <div class="content-left">
           <div class="logo-wrapper">
-            <div class="logo" :class="{'highlight':totalCount>0}" @click="toggleList">
+            <div class="logo" :class="{'highlight':totalCount>0}">
               <i class="icon-shopping_cart" :class="{'highlight':totalCount>0}"></i>
             </div>
             <div class="num" v-show="totalCount>0">
-              <bubble :num="totalCount" :key="bubbleKey"></bubble>
+              <bubble :num="totalCount"></bubble>
             </div>
           </div>
           <div class="price" :class="{'highlight':totalPrice>0}">￥{{totalPrice}}</div>
-          <div class="desc" @click="showHistory">订单</div>
+          <div class="desc">另需配送费￥20元</div>
         </div>
         <div class="content-right" @click="pay">
           <div class="pay" :class="payClass">
-            去支付
+            {{payDesc}}
           </div>
         </div>
       </div>
@@ -27,7 +27,6 @@
             @enter="dropping"
             @after-enter="afterDrop">
             <div class="ball" v-show="ball.show">
-           
               <div class="inner inner-hook"></div>
             </div>
           </transition>
@@ -58,10 +57,16 @@
         type: Array,
         default() {
           return []
-	        }
+        }
       },
-     
-      
+      deliveryPrice: {
+        type: Number,
+        default: 0
+      },
+      minPrice: {
+        type: Number,
+        default: 0
+      },
       sticky: {
         type: Boolean,
         default: false
@@ -74,23 +79,20 @@
     data() {
       return {
         balls: createBalls(),
-        dropBalls: [],
-        listFold: this.fold,
-        bubbleKey:0
+        listFold: this.fold
       }
     },
     created() {
-      
+      this.dropBalls = []
     },
     computed: {
       totalPrice() {
         let total = 0
         this.selectFoods.forEach((food) => {
-          if(food.attr_price){
-             total += food.attr_price * food.count
-          }else{
-             total += food.price * food.count
-          }
+           
+           food.counts.forEach((fd) =>{
+              total += fd.count*fd.price;
+           });
           
         })
         return total
@@ -98,29 +100,34 @@
       totalCount() {
         let count = 0
         this.selectFoods.forEach((food) => {
-          count += food.count
+           food.counts.forEach((fd) =>{
+             count += fd.count
+           });
         })
         return count
       },
+        
       payDesc() {
+        /*
         if (this.totalPrice === 0) {
-          return '￥4元起送'
+          return `￥${this.minPrice}元起送`
+        } else if (this.totalPrice < this.minPrice) {
+          let diff = this.minPrice - this.totalPrice
+          return `还差￥${diff}元起送`
         } else {
           return '去结算'
-        }
+        }*/
+        return '去支付'
       },
       payClass() {
+        if (!this.totalCount) {
+          return 'not-enough'
+        } else {
           return 'enough'
+        }
       }
     },
     methods: {
-    
-     updateSelectFoods (foods) {
-     
-        this.selectFoods = foods;
-        this.bubbleKey++;// 强制汽泡数值更新
-     },
-    
       toggleList() {
         if (this.listFold) {
           if (!this.totalCount) {
@@ -135,12 +142,14 @@
         }
       },
       pay(e) {
-        
+        if (this.totalPrice < this.minPrice) {
+          return
+        }
         this.$createDialog({
           title: '支付',
-          content: 'Payment'
+          content: `您需要支付${this.totalPrice}元`
         }).show()
-         e.stopPropagation()
+        e.stopPropagation()
       },
       drop(el) {
         for (let i = 0; i < this.balls.length; i++) {
@@ -154,17 +163,17 @@
         }
       },
       beforeDrop(el) {
+       
+        //object HTMLDivElement]
         const ball = this.dropBalls[this.dropBalls.length - 1]
-        
-        if(ball.el){
         const rect = ball.el.getBoundingClientRect()
+        
         const x = rect.left - 32
         const y = -(window.innerHeight - rect.top - 22)
         el.style.display = ''
         el.style.transform = el.style.webkitTransform = `translate3d(0,${y}px,0)`
         const inner = el.getElementsByClassName(innerClsHook)[0]
         inner.style.transform = inner.style.webkitTransform = `translate3d(${x}px,0,0)`
-        }
       },
       dropping(el, done) {
         this._reflow = document.body.offsetHeight
@@ -203,7 +212,8 @@
         this.shopCartStickyComp = this.shopCartStickyComp || this.$createShopCartSticky({
           $props: {
             selectFoods: 'selectFoods',
-            
+            deliveryPrice: 'deliveryPrice',
+            minPrice: 'minPrice',
             fold: 'listFold',
             list: this.shopCartListComp
           }
@@ -216,60 +226,18 @@
       },
       _hideShopCartSticky() {
         this.shopCartStickyComp.hide()
-      },
-      
-      //start history
-    
-    showHistory(event) {
-        this.historyComp = this.historyComp || this.$createHistory({
-          $props: {
-            message: 'Hello World'
-          },
-          $events: {
-            add: (target) => {
-              
-            },
-            leave: () => {
-              this.showMsg(1000,'阁下离开中...')
-            }
-          }
-        })
-        this.historyComp.show()
-      },
-      
-      showMsg(ms,msg ) {
-      const toast = this.$createToast({
-        time: ms,
-        txt: msg
-      })
-      toast.show()
+      }
     },
-    
-    //end history
-  
-    },
-    
-    created () {
-    
-            
-    },
-    
     watch: {
       fold(newVal) {
-      
-        
         this.listFold = newVal
       },
       totalCount(count) {
-        
         if (!this.fold && count === 0) {
           this._hideShopCartList()
         }
       }
     },
-    
-    
-    
     components: {
       Bubble
     }
@@ -279,16 +247,14 @@
 <style lang="stylus" scoped>
   @import "../../common/stylus/mixin"
   @import "../../common/stylus/variable"
-/* 购物车外层、内层小圆圈*/
+
   .shopcart
     height: 100%
-    z-index: 200
     .content
       display: flex
       background: $color-background
       font-size: 0
       color: $color-light-grey
-      
       .content-left
         flex: 1
         .logo-wrapper
@@ -309,7 +275,6 @@
             border-radius: 50%
             text-align: center
             background: $color-dark-grey
-           
             &.highlight
               background: $color-blue
             .icon-shopping_cart
@@ -327,7 +292,6 @@
           vertical-align: top
           margin-top: 12px
           line-height: 24px
-          width: 120px
           padding-right: 12px
           box-sizing: border-box
           border-right: 1px solid rgba(255, 255, 255, 0.1)
@@ -335,7 +299,6 @@
           font-size: $fontsize-large
           &.highlight
             color: $color-white
-          
         .desc
           display: inline-block
           vertical-align: top
@@ -354,20 +317,19 @@
           &.not-enough
             background: $color-dark-grey
           &.enough
-            background: $color-thin-red
+            background: $color-green
             color: $color-white
     .ball-container
       .ball
         position: fixed
         left: 32px
         bottom: 22px
-       
+        z-index: 200
         transition: all 0.4s cubic-bezier(0.49, -0.29, 0.75, 0.41)
         .inner
           width: 16px
           height: 16px
           border-radius: 50%
           background: $color-blue
-         
           transition: all 0.4s linear
 </style>

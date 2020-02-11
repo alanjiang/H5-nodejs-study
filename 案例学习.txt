@@ -293,5 +293,25 @@ alert('=>symbol:'+this.symbol+',label:'+this.label);
            this.$emit(EVENT_ADD, event.target);
 
 
+totalPrice() {
+        let total = 0
+        this.selectFoods.forEach((food) => {
+           
+           food.counts.forEach((fd) =>{
+              total += fd.count*fd.price;
+           });
+          
+        })
+        return total
+      },
+      totalCount() {
+        let count = 0
+        this.selectFoods.forEach((food) => {
+           food.counts.forEach((fd) =>{
+             count += fd.count
+           });
+        })
+        return count
+      },
 
 

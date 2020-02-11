@@ -1,5 +1,6 @@
 <template>
 <div class="cartcontrol">
+   
     <transition name="move">
       <div class="cart-decrease" v-show="food.selectedCount>0" @click.stop="decrease">
         <span class="inner icon-remove_circle_outline"></span>
@@ -9,12 +10,17 @@
     <div class="cart-add icon-add_circle" @click.stop="addToCart"></div>
     
   </div>
+  
+  
+ 
+  
 </template>
+<!--  cart-control-label 仅在 shop-cart-list.vue中使用，处理有规格的商品 -->
 <script>
   const EVENT_ADD = 'add';
-  import { setGlobal,getGlobal,removeGlobal } from '../../api'
+  const EVENT_REMOVE = 'remove';
   export default {
-    name: 'mycart',
+    name: 'mycartlabel',
     props: {
       food: {
         type: Object
@@ -22,48 +28,26 @@
     },
     
     data() {
-       //必须写一个空的返回值，否则有异常
-      return { 
-      
-      }
-         
+    
+        return {}  
     },
     
+  
     methods: {
       //（+） 加商品到购物车的动作，所有的非规格商品购物车逻辑的唯一入口
       addToCart(event) {
-          /*
-           数据微调即可：
-            数量由count变成数组
-           (1) 有规格的
-           {'id':xx,'name':xx,'image':xxx, 'haslabel':'no', 'selectedCount': xx
-              'counts':[ {'label':XX,'symbol':XX,'price':XX,'count':xx},...]
-           }
-           (2) 无规格
-            { 'id':xx,'name':xx,'image':xxx, 'haslabel':'no', 'selectedCount':yy
-              'counts':[ {'price':XX,'count':XX}]
-           }
-          
-          */
-         
-           //针对无规格商品
-            if (this.food.selectedCount == 0) {
-              this.$set(this.food, 'selectedCount', 1);
-              this.food.counts[0].count =1;
-             }else {
-              this.food.selectedCount++;
-              this.food.counts[0].count++;
-            }
+            
+            //将事件冒泡给cart-control-list.vue 组件
             this.$emit(EVENT_ADD, event.target)
+            
+            this.$bus.emit('openAttr',this.food);
       
       },
-      decrease() {
-        
-          if (this.food.selectedCount > 0) {
-              this.food.selectedCount--;
-              this.food.counts[0].count--;
-          }
-          
+      decrease(event) {
+          //将事件冒泡给cart-control-list.vue 组件
+          this.$emit(EVENT_REMOVE, event.target)
+         
+          this.$bus.emit('openAttr',this.food);
       },
        //消息方法    
        showMsg(ms,msg ) {

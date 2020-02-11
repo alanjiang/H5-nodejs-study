@@ -18,22 +18,45 @@
             <h1 class="title">购物车</h1>
             <span class="empty" @click="empty">清空</span>
           </div>
-          <cube-scroll class="list-content" ref="listContent" click="true">
+          <cube-scroll class="list-content" ref="listContent">
             <ul>
+            
+            
               <li
                 class="food"
                 v-for="(food,index) in selectFoods"
                 :key="index"
               >
-                <span class="name">{{ food.name }}</span>
-                <span class="attr">{{ food.label }}</span>
-                <div class="price">
-                  <span v-if="food.symbol">￥{{ food.attr_price*food.count }}</span>
-                  <span v-else>￥{{ food.price*food.count }}</span>
-                </div>
-                <div class="cart-control-wrapper">
-                  <cart-control @add="onAdd" :food="food" @handler="onHandler"></cart-control>
-                </div>
+              
+               <!-- 无规格显示 -->
+               <div v-if="food.haslabel == 'no'">
+                  <span class="name">{{food.name}}</span>
+                  <span class ="label"></span>
+                  <div class="price">
+                    <span>￥{{food.counts[0].price * food.counts[0].count}}</span>
+                   </div>
+                  <div class="cart-control-wrapper">
+                     <mycart @add="onAdd" :food="food"></mycart>
+                   </div>
+               </div>
+               
+               <!-- 有规格显示 -->
+               <div v-else>
+                  <span class="name">{{food.name}}</span>
+                  <span class ="label"> 
+                    {{ showLabel(food) }}
+                  </span>
+                  <div class="price">
+                    <span>￥ {{ showTotalPrice(food) }}</span>
+                   </div>
+                  <div class="cart-control-wrapper">
+                     
+                     <mycartlabel @add="notify" @remove="notify"  :food="food"></mycartlabel>
+                   </div>
+               </div>
+               
+               
+               
               </li>
             </ul>
           </cube-scroll>
@@ -44,7 +67,8 @@
 </template>
 
 <script>
-  import CartControl from '../addToCart/cart-control'
+  import mycart from '../addToCart/cart-control'
+  import mycartlabel from '../addToCart/cart-control-label'
   import popupMixin from '../../common/mixins/popup'
 
   const EVENT_SHOW = 'show'
@@ -65,36 +89,61 @@
     created() {
       this.$on(EVENT_SHOW, () => {
         this.$nextTick(() => {
-          this.$refs.listContent.refresh()
-        });
-      });
-   
-      
-    },
-    
-    methods: {
-    
-      //处理规格商品专用
-      onHandler(fd) {
-        
          
-         alert('=>receive from cart-control event:'+JSON.stringify(fd));
-         //通知 Goods.vue, shop-cart-list.vue 更新 goods
-         this.$bus.emit('updateSelectFoods',fd);
+             this.$refs.listContent.refresh()
+          
+          
+        })
+      })
+    },
+    methods: {
+      //有规格组件cart-control-label.vue, add 事件处理
+      notify (target) {
+         
+           this.hide();
       },
-    
-    
+      // 有规格商品显示
+      showLabel( food ){
+          
+         var str = '';
+         food.counts.forEach((item)=>{
+             if(item.count>0){
+              str = str+item.label.split(':')[1]+'x'+item.count+' '
+             }
+             
+         
+         });
+          
+          return str;
+         
+      }, 
+       // 有规格商品显示
+      showTotalPrice( food ){
+          
+         var price = 0;
+         food.counts.forEach((item)=>{
+             if(item.count>0){
+                price = item.count*item.price;
+             }
+            
+         
+         });
+          
+          return price;
+         
+      }, 
+      
+      
+      
+      
+      
       onAdd(target) {
-        
-          this.$emit(EVENT_ADD);
-        
-        
+        this.$emit(EVENT_ADD, target)
       },
       afterLeave() {
         this.$emit(EVENT_LEAVE)
       },
       maskClick() {
-        alert('<=maskClick=>');
         this.hide()
       },
       empty() {
@@ -114,7 +163,8 @@
       }
     },
     components: {
-      CartControl
+       mycart,
+       mycartlabel 
     }
   }
 </script>
@@ -123,8 +173,6 @@
   @import "../../common/stylus/variable"
   .cube-shop-cart-list
     bottom: 48px
-    display: flex
-    flex-direction: column
     &.fade-enter, &.fade-leave-active
       opacity: 0
     &.fade-enter-active, &.fade-leave-active
@@ -134,69 +182,60 @@
     .move-enter-active, .move-leave-active
       transition: all .3s ease-in-out
     .list-header
-      
       height: 40px
       line-height: 40px
       padding: 0 18px
       background: $color-background-ssss
-      box-sizing: border-box
-      display: flex
       .title
-        
-        width:200px
-        margin-right: auto
+        float: left
         font-size: $fontsize-medium
         color: $color-dark-grey
       .empty
-       
+        float: right
         font-size: $fontsize-small
         color: $color-blue
 
     .list-content
-      clear: both
       padding: 0 18px
       max-height: 217px
       overflow: hidden
       background: $color-white
-      width: 100%
-      display: flex
-      flex-direction: column
-      
       .food
         position: relative
-        display: flex
-        flex-direction: row
         padding: 12px 0
         box-sizing: border-box
+        display: flex
+        flex-direction: row
         .name
-          width: 120px
-          line-height: 24px
-          font-size: $fontsize-medium
+          line-height: auto
+          font-size: $fontsize-small
           color: $color-dark-grey
-          font-weight:500
-          display: inline-block
-          overflow: hidden
-          
-        .attr
-          width: 120px
-          line-height: 24px
-          font-size: $fontsize-medium
-          color: $color-light-orange
-          font-weight:500
-          display: inline-block
-          overflow: hidden
-       
-        .price
           width: 100px
-          line-height: 24px
+          word-wrap:break-word
+          padding: 2px 5px
+          display: inline-block
+        .label
+          line-height: auto
+          font-size: $fontsize-small-ss
+          color: $color-dark-orange
+          width: 120px
+          word-wrap:break-word
+          padding: 2px 5px
+          display: inline-block
+        .price
+          line-height: auto
           font-weight: 700
           font-size: $fontsize-medium
           color: $color-red
+          width: 120px
+          margin-right: auto
+          word-wrap:break-word
+          padding: 2px 5px
           display: inline-block
         .cart-control-wrapper
+          display: inline-block
           position: absolute
-          right: 13px
+          right: 0
           bottom: 6px
-          
 
 </style>

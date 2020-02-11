@@ -36,11 +36,13 @@
                
             </div>
             
+             <div class="cart-control-wrapper">
+              <!-- +,- 购物车增加、移除商品组件, 监听 cart-control中发出的事件 -->
+              <addcartlabel @add="addFood"  @remove="removeFood" :food="food"></addcartlabel>
+            </div>
            
-              <div @click="addToCart" class="buy">
-                  加入购物车
-              </div>
             
+           
           </div> <!-- end of class="content" --> 
           
           
@@ -57,7 +59,6 @@
               @toggle="onToggle"
               :selectType="selectType"
               :onlyContent="onlyContent"
-             
               :ratings="ratings">
             </rating-select>
             <div class="rating-wrapper">
@@ -88,7 +89,7 @@
 
 <script type="text/ecmascript-6">
   import moment from 'moment'
-  
+  import addcartlabel from '../addToCart/cart-control-label'
   import RatingSelect from '../rating-select/rating-select'
   import Split from '../split/split'
   import ratingMixin from '../../common/mixins/rating'
@@ -156,30 +157,68 @@
         this.total_price = null;
         this.valid = false;
         //返回时继续同步商品给Goods.vue
-        
-        this.$emit(EVENT_LEAVE,this.food);
+        //this.$emit(EVENT_LEAVE,this.food);
         
         
       },
-      addToCart(event) { 
-        
+      
+      addFood(target) { 
+         
          if(!this.judgeAttrComplete()){
            return;
          }
-           //自增或自减数量在Goods.vue一端维护
+           
            this.food.symbol = this.symbol;
            this.food.label = this.label;
            this.food.attr_price = this.price;
            this.food.count = 1;
-           this.food.flag = 'add'
-           //通知 Goods.vue, shop-cart-list.vue 更新 goods
-           this.$bus.emit('updateSelectFoods',this.food);
-           //var target = {"_prevClass":"cart-add icon-add_circle"};
-           this.$emit(EVENT_ADD, event.target);
+           var idx = -1;
+           this.food.counts.forEach((curr,index,arr)=> {
+              if(curr.symbol == this.symbol){
+                 idx = index;
+              }
+            });
+           
+           
+           if (idx == -1){
+               this.showMsg(1000,'规格有问题' ); //始终不会发生
+               return false;
+           }
+           //数量更新
+           this.food.counts[idx].count = this.food.counts[idx].count+1;
+           this.food.selectedCount =  this.food.selectedCount+1;
+           
+           this.$emit(EVENT_ADD, target);
            
         
       },
+      removeFood(event){
+           if(!this.judgeAttrComplete()){
+              return;
+           }
+           this.food.symbol = this.symbol;
+           this.food.label = this.label;
+           this.food.attr_price = this.price;
+           this.food.count = 1;
+           var idx = -1;
+           this.food.counts.forEach((curr,index,arr)=> {
+              if(curr.symbol == this.symbol){
+                 idx = index;
+              }
+            });
+           
+          
+           if (idx == -1){
+               this.showMsg(1000,'规格有问题' ); //始终不会发生
+               return false;
+           }
+           //数量更新
+           this.food.counts[idx].count = this.food.counts[idx].count-1;
+           this.food.selectedCount =  this.food.selectedCount-1;
+           
+            
       
+      },
       format(time) {
         return moment(time).format('YYYY-MM-DD hh:mm')
       },
@@ -327,7 +366,7 @@
     },
 
      components: {
-     
+      addcartlabel,
       RatingSelect,
       Split
       }

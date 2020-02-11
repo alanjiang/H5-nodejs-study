@@ -36,11 +36,19 @@
               :key="food.id"
               class="food-item"
             >
-              <div class="icon"  @click="selectFood(food)">
-                <img width="57" height="57" :src="food.image">
+             
+              <div class="icon"  v-if="food.haslabel=='no'">
+                <img width="57" height="57" :src="food.image" @click="selectFood(food)">
               </div>
+              
+        
+              <div class="icon" v-else>
+                <img width="57" height="57" :src="food.image" @click="selectAttr(food)">
+              </div>
+          
+             
               <div class="content">
-                <h2 class="name"  @click="selectFood(food)">{{ food.name }}</h2>
+                <h2 class="name">{{ food.name }}</h2>
                 <p class="desc">DDDD</p>
                 <div class="extra">
                   <span class="count">月售12份</span><span>好评率89%</span>
@@ -50,19 +58,26 @@
                   ￥{{ food.price_span }}
                   </span>
                   <span class="now" v-else>
-                  ￥{{ food.price }}
+                  ￥{{ food.counts[0].price }}
                   </span>
                   
                   
                 </div>
                 
                 
-                <div class="cart-control-wrapper" v-if="!food.mer_attr_price || food.mer_attr_price.length==0 ">
-                  <addcart :food="food" @add="onAdd"></addcart>
+                <div class="cart-control-wrapper" v-if="food.haslabel=='no'">
+                  <addcart @add="onAdd" :food="food"></addcart>
                 </div>
-                <div class="cart-control-wrapper" v-else>
-                  <a href="#" @click="selectAttr(food)"> 我要买 </a>
-                </div>
+                 <div class="cart-control-wrapper" v-else>
+                   <div class="cartcontrol">
+                   <div class="cart-decrease" v-show="food.selectedCount>0" @click="selectAttr(food)">
+                     <span class="inner icon-remove_circle_outline"></span>
+                   </div>
+                   <div class="cart-count" v-show="food.selectedCount>0">{{food.selectedCount}}</div>
+                    <div class="cart-add icon-add_circle" @click="selectAttr(food)"></div>
+                  </div>
+                 </div>
+                
                 
                 
               </div>
@@ -121,12 +136,14 @@ export default {
         let foods = []  // 商品选中后,count属性累加
         // 商品选中后,count属性累加
          this.goods.forEach((good) => {
-           good.mers.forEach((food) => { //good.mers: 为规格商品保留
-             if (food.count && food.count > 0) {
+           good.items.forEach((food) => { 
+             if (food.selectedCount > 0) {
                 foods.push(food)
               }
           });
         });
+        
+        
         return foods;
       },
      
@@ -134,16 +151,16 @@ export default {
       
       barTxts() {
         let txts = []
+        //按类型 
         this.goods.forEach((good) => {
-          var foods = good.items;
-          var mers =  good.mers;
-          
+          var items = good.items;
+
           var type = good.type
           var name = good.type
           
           let count = 0
-          mers.forEach((food) => {
-            count += food.count || 0;
+          items.forEach((food) => {
+            count += food.selectedCount 
        
           });
            txts.push({
@@ -172,7 +189,6 @@ export default {
        
        this.selectedFood = food;
        var target = {"_prevClass":"cart-add icon-add_circle"};
-       
        this.$refs.shopCart.drop(target)
        this.selectAttr(food);
      
@@ -316,38 +332,39 @@ export default {
                             
               let types = new Set(sorts)
              
-              /*根据商品的分类来展示商品，需要转换原有的数据结构
-              
-              "type":"炒面", "items":[
-              
-              { "id":2387,"name":"烩面","image":"","unit":"份","price":15, "attrs":[], "mer_attr_price":[] },
-              
-              ]
-              */
-              
               var mers = [] 
               types.forEach(type => {
-                 mers.push({"type":type,"items":[],'mers':[]});
+                 mers.push({"type":type,"items":[]});
               });
                //所有的商品遍历,items: 所有的商品列表, mers: [{"type":xx,"items":[],"mers":[]},...]
               items.forEach(item=>{
                    //按商品种类Map遍历Map<k:sort,v:[]>
                    for( var i = 0; i <mers.length; i++){
                        var mer = mers[i];
+                        
+                       
                        if (item.sort == mer.type){
+                          
+                           var m = {'id':item.id, 'name': item.name,'sort': item.sort,'image':item.image, 'haslabel':'','counts':[], 'selectedCount':0};          
+                
                            if (item.mer_attr_price.length > 0 ){//有规格商品
-                              mer.items.push(item);
+                              m.haslabel = 'yes';
+                              m.price_span = item.price_span;
+                              m.attrs = item.attrs;
+                              m.mer_attr_price = item.mer_attr_price;
                               item.mer_attr_price.forEach(t => {
                                  item.label = t.label;
                                  item.attr_price = t.price; //用mer_attr_price中的价格
                                  item.symbol = t.symbol;
-                                 mer.mers.push({'id':item.id,'name':item.name,'price':item.price,'label':item.label,'attr_price':item.attr_price,'symbol':item.symbol});
+                                 m.counts.push({'price':item.price,'label':item.label,'price':item.price,'symbol':item.symbol,'count':0});
                                  
                                });
                            }else{//没有规格的商品
-                              mer.items.push(item); // items:[{...},...,{...}]
-                              mer.mers.push(item);
+                                m.haslabel = 'no';
+                                m.counts.push({'price':item.price,'count':0});
+                             
                            }
+                            mer.items.push(m); 
                             break;
                        }//end of item.sort == mer.type
                      
@@ -356,7 +373,8 @@ export default {
               });// 完成对mers更新
                  
               this.goods = mers;
-            
+              
+              console.log(JSON.stringify(this.goods));
              
            }else{
               this.showMsg(1000,result.resMsg);
@@ -474,20 +492,14 @@ export default {
    created() {
      
       this._getShopMers()
-      //cart-control.vue中的 openAttr事件
+      //cart-control-label.vue中的 openAttr事件
       this.$bus.on('openAttr', (val) => {
                
              this.selectAttr(val);
                 
        });
        
-       
-       this.$bus.on('updateSelectFoods', (val) => {
-             
-             this.selectedFood = val;  
-             this.resetFoods(val);
-              
-       });
+  
      
     }
     
@@ -607,6 +619,39 @@ export default {
         position: absolute
         right: 0
         bottom: 12px
+        .cartcontrol
+           display: flex
+           align-items: center
+           .cart-decrease
+             display: inline-block
+             padding: 6px
+             opacity: 1
+             .inner
+                display: inline-block
+                line-height: 24px
+                font-size: $fontsize-large-xxx
+                color: $color-blue
+                transition: all 0.4s linear
+                transform: rotate(0)
+             &.move-enter-active, &.move-leave-active
+                transition: all 0.4s linear
+             &.move-enter, &.move-leave-active
+                opacity: 0
+                transform: translate3d(24px, 0, 0)
+                .inner
+                   transform: rotate(180deg)
+           .cart-count
+              width: 12px
+              line-height: 24px
+              text-align: center
+              font-size: $fontsize-small-s
+              color: $color-grey
+           .cart-add
+             display: inline-block
+             padding: 6px
+             line-height: 24px
+             font-size: $fontsize-large-xxx
+             color: $color-blue
     .shop-cart-wrapper
       position: absolute
       left: 0

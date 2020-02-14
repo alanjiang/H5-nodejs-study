@@ -8,15 +8,18 @@
       <cube-scroll ref="scroll">
         <div class="my-content">
          
-            <img src="../../assets/user.jpg" >
+            <img :src="member_authen.headimgurl" >
            
             
             <div class="left">
               <div class="title">
-                 白天不懂夜的黑
+                 {{member_authen.nickname }}
               </div>
-              <div class="title-small">
-                 会员号：13926003676
+              <div class="title-small" v-if="member_authen.mobile">
+                 会员号：{{member_authen.mobile }} 
+              </div>
+               <div class="title-small" v-else>
+                 未认证会员
               </div>
               <div class="score">
                  <span class="score-caption">累积积分</span>  <span class="score-value">10</span>
@@ -144,8 +147,8 @@
     name: 'my',
     mixins: [popupMixin],
     props: {
-      message: {
-        type:String
+      member_authen: {
+        type:Object
       }
     },
     

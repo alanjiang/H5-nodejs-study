@@ -36,7 +36,7 @@
               :key="food.id"
               class="food-item"
             >
-             
+                                         
               <div class="icon"  v-if="food.haslabel=='no'">
                 <img width="57" height="57" :src="food.image" @click="selectFood(food)">
               </div>
@@ -105,7 +105,14 @@ import Bubble from './bubble/bubble'
 
 export default {
   name: 'Goods',
-  
+  props: {
+      data: {
+        type: Object,
+        default() {
+          return {}
+        }
+      }
+    },
   components: {
       Bubble,
       addcart,
@@ -114,7 +121,7 @@ export default {
    
   data () {
     return {
-       goods:[],
+      // goods:[],
        selectedFood: {},
        default() {
           return {}
@@ -130,7 +137,9 @@ export default {
   },
   
   computed: {
-      
+      goods() { //商品由 Home.vue页面传给子组件 Goods.vue
+        return this.data.goods
+      },
       selectFoods() {
         console.log('=>selectFoods 自动刷新<=');
         let foods = []  // 商品选中后,count属性累加
@@ -142,8 +151,7 @@ export default {
               }
           });
         });
-        
-        
+       
         return foods;
       },
      
@@ -345,7 +353,7 @@ export default {
                        
                        if (item.sort == mer.type){
                           
-                           var m = {'id':item.id, 'name': item.name,'sort': item.sort,'image':item.image, 'haslabel':'','counts':[], 'selectedCount':0};          
+                           var m = {'id':item.id, 'name': item.name,'sort': item.sort,'image':item.image, 'haslabel':'','counts':[], 'selectedCount':0,'unit':item.unit};          
                 
                            if (item.mer_attr_price.length > 0 ){//有规格商品
                               m.haslabel = 'yes';
@@ -354,7 +362,7 @@ export default {
                               m.mer_attr_price = item.mer_attr_price;
                               item.mer_attr_price.forEach(t => {
                                  item.label = t.label;
-                                 item.attr_price = t.price; //用mer_attr_price中的价格
+                                 item.price = t.price; //用mer_attr_price中的价格
                                  item.symbol = t.symbol;
                                  m.counts.push({'price':item.price,'label':item.label,'price':item.price,'symbol':item.symbol,'count':0});
                                  
@@ -374,7 +382,15 @@ export default {
                  
               this.goods = mers;
               
-              console.log(JSON.stringify(this.goods));
+              
+              if( result.member_authen  ){
+                  this.$emit('syncHead',result.member_authen,result.shop);
+                  
+                  alert('==>Goods事件已发出<==');
+              }
+             
+              
+              
              
            }else{
               this.showMsg(1000,result.resMsg);
@@ -384,7 +400,7 @@ export default {
         })
       
       },
-    
+     
       //消息方法    
        showMsg(ms,msg ) {
          const toast = this.$createToast({
@@ -400,26 +416,11 @@ export default {
         this.showAttr()
         this.showShopCartSticky()
       },
+      //无规格商品才会使用
       selectFood(food) {
-      
-        if( !food.attrs || food.attrs.length == 0){
           this.selectedFood = food
           this.showFood()
-          this.showShopCartSticky()  
-          
-            
-        }
-        else{
-        
-          this.selectedFood = food
-          this.showAttr()
           this.showShopCartSticky()
-        
-        }
-        
-        
-        
-        
       },
       //food.vue中的addFoold事件,this.$emit(EVENT_ADD, target)
       //监听 cart-controll.vue中的事件
@@ -481,17 +482,38 @@ export default {
       },
       hideShopCartSticky() {
         this.shopCartStickyComp.hide()
+      },
+      
+      //start 我当前的订单
+      showMe (val) {
+      
+       this.myComp = this.myComp || this.$createMy({
+          $props: {
+            member_authen: val
+          },
+          $events: {
+            add: (target) => {
+               
+            },
+            leave: () => {
+              this.showMsg(1000,'阁下离开中...')
+            }
+          }
+        })
+        this.myComp.show()
+      
+      
+      
       }
       
-      
-      
+      //end 我当前的订单
       
       
    },
    
    created() {
      
-      this._getShopMers()
+     //this._getShopMers()
       //cart-control-label.vue中的 openAttr事件
       this.$bus.on('openAttr', (val) => {
                
@@ -499,25 +521,15 @@ export default {
                 
        });
        
-  
-     
+       this.$bus.on('openMe', (val) => {
+               
+             this.showMe(val);
+                
+       });
+
     }
     
-    /*
-    watch: {
-      selectFoods(newValue) {
-         
-          alert('=>selectFoods new value:'+newValue);
-        
-       },
-       goods(newValue) {
-         
-          alert('=>goods new value:'+newValue);
-        
-       }
-       
-    },
-    */
+    
       
    
 }

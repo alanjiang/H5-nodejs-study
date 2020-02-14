@@ -20,8 +20,7 @@
           </div>
           <cube-scroll class="list-content" ref="listContent">
             <ul>
-            
-            
+           
               <li
                 class="food"
                 v-for="(food,index) in selectFoods"
@@ -33,7 +32,7 @@
                   <span class="name">{{food.name}}</span>
                   <span class ="label"></span>
                   <div class="price">
-                    <span>￥{{food.counts[0].price * food.counts[0].count}}</span>
+                    <span>￥{{showTotalPrice(food)}}</span>
                    </div>
                   <div class="cart-control-wrapper">
                      <mycart @add="onAdd" :food="food"></mycart>
@@ -117,19 +116,21 @@
           return str;
          
       }, 
+      
+     
        // 有规格商品显示
       showTotalPrice( food ){
           
          var price = 0;
          food.counts.forEach((item)=>{
              if(item.count>0){
-                price = item.count*item.price;
+                price = Number((item.count*item.price).toFixed(2));
              }
             
          
          });
           
-          return price;
+          return price.toFixed(2);
          
       }, 
       
@@ -153,7 +154,15 @@
           $events: {
             confirm: () => {
               this.selectFoods.forEach((food) => {
-                food.count = 0
+                food.selectedCount = 0
+                if(food.haslabel=='yes'){//有规格的商品counts中的数量清空
+                    var num = food.counts.length;
+                    for (var i=0; i<num; i++){
+                    
+                      food.counts[i].count == 0; 
+                    
+                    }
+                }
               })
               this.hide()
             }
@@ -186,12 +195,15 @@
       line-height: 40px
       padding: 0 18px
       background: $color-background-ssss
+      display: flex
+      flex-direction: row
       .title
-        float: left
+        width: 200px
         font-size: $fontsize-medium
         color: $color-dark-grey
+        margin-right: auto
       .empty
-        float: right
+        
         font-size: $fontsize-small
         color: $color-blue
 
@@ -200,6 +212,7 @@
       max-height: 217px
       overflow: hidden
       background: $color-white
+      
       .food
         position: relative
         padding: 12px 0

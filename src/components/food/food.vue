@@ -16,23 +16,10 @@
           
           <div class="content">
             <h1 class="title">{{food.name}}</h1>
-            <!-- start of  规格  -->
-            <div class="detail">
-            <div  v-for="(attr,index1) in food.attrs">
-                 
-                  <span class="scall"> {{attr.attr_key}} </span>
-                  <ul>
-                     <li v-for="(item,index) in attr.attr_values"  class="label"
-                         :class="{label_active: index1 == 0 ? selected1 == index : selected2 == index}"  @click="index1 == 0 ? chooseItem1(index,item.attr_id):chooseItem2(index,item.attr_id)" >
-                        {{ item.attr_value }}  
-                     </li> 
-                   </ul>
-            </div>
-            </div>
-            <!-- end of  规格  -->
+            
             <div class="price">
               
-               <span class="now" v-else>￥ {{ food.price }} </span>
+               <span class="now">￥ {{ food.counts[0].price }}/{{food.unit}} </span>
              
               
             </div>

@@ -91,11 +91,11 @@
         this.selectFoods.forEach((food) => {
            
            food.counts.forEach((fd) =>{
-              total += fd.count*fd.price;
+              total += Number((fd.count*fd.price).toFixed(2));
            });
           
         })
-        return total
+        return total.toFixed(2);
       },
       totalCount() {
         let count = 0

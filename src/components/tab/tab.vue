@@ -6,7 +6,7 @@
       v-model="selectedLabel"
       :data="tabs"
       ref="tabBar"
-      class="border-bottom-1px"
+      class="border-bottom-1px" 
     >
     </cube-tab-bar>
     <div class="slide-wrapper">
@@ -78,9 +78,15 @@
       onChange(current) {
         this.index = current
         const instance = this.$refs.component[current]
+        console.log('=>selected index:'+current);
+        if( current == 1 ){
+           console.log('updated:'+instance.updated);
+           instance.fetchAddress(); //调用方法
+        }
+        /*
         if (instance && instance.fetch) {
           instance.fetch()
-        }
+        }*/
       }
     }
   }
@@ -88,14 +94,17 @@
 
 <style lang="stylus" scoped>
   @import "../../common/stylus/variable"
-
+  @import "../../common/stylus/variable"
   .tab
     display: flex
     flex-direction: column
     height: 100%
+    font-size:14px
     >>> .cube-tab
       padding: 10px 0
     .slide-wrapper
       flex: 1
       overflow: hidden
+    
+     
 </style>

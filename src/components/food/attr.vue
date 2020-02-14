@@ -31,8 +31,16 @@
             </div>
             <!-- end of  规格  -->
             <div class="price">
-               <span class="now" v-if="valid">￥ {{ this.price }} </span>
-               <span class="now" v-else>￥ {{ food.price_span }} </span>
+            
+               <div v-if="valid">
+                 <span class="now">￥{{ this.price }} /{{food.unit}} </span>
+                  <span class="now">所选规格:{{this.label}}  </span>
+                  <span class="select">购买数量：{{ getCount(this.symbol) }}   </span>
+                  
+               </div>
+              
+               <span class="now" v-else>￥ {{ food.price_span }}/{{food.unit}}  </span>
+               
                
             </div>
             
@@ -147,6 +155,20 @@
       })
     },
     methods: {
+    
+    
+       
+      getCount(symbol){
+         console.log('symbol='+symbol);
+         console.log(JSON.stringify(this.food.counts));
+         var cur = this.food.counts.find((t)=>t.symbol == symbol);
+         if(cur){
+           
+           //console.log(JSON.stringify(cur));
+           return cur.count;
+         }
+         return 0;
+      },
       afterLeave() {
         //用户离开后，清理规格的选择值
         this.selected1 = -1 ;
@@ -213,8 +235,11 @@
                return false;
            }
            //数量更新
-           this.food.counts[idx].count = this.food.counts[idx].count-1;
-           this.food.selectedCount =  this.food.selectedCount-1;
+           if(this.food.counts[idx].count > 0){
+              this.food.counts[idx].count = this.food.counts[idx].count-1;
+              this.food.selectedCount =  this.food.selectedCount-1;
+           }
+           
            
             
       
@@ -460,12 +485,14 @@
       .price
         line-height: 24px
         font-weight: 700
+        display: flex
+        flex-direction: column
         .now
-          margin-right: 8px
           font-size: 14px
           color: $color-red
-        .old
-          text-decoration: line-through
+          display: block
+        .select
+          display: block
           font-size: $fontsize-small-s
           color: $color-light-grey
       .cart-control-wrapper

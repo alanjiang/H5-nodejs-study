@@ -10,7 +10,7 @@
           <div class="image-header">
             <img :src="food.image">
             <div class="back" @click="hide">
-              <i class="icon-arrow_lift"></i>
+              <img src="../../assets/back.png">
             </div>
           </div> <!-- end of class="image-header" -->
           
@@ -28,7 +28,7 @@
               <addcart @add="addFood" :food="food" ></addcart>
             </div>
             <transition name="fade">
-              <div @click="addFirst" class="buy" v-show="!food.count">
+              <div @click="addFirst" class="buy" v-show="!food.selectedCount">
                 加入购物车
               </div>
             </transition>
@@ -126,10 +126,12 @@
         //用户离开后，清理规格的选择值
         
         this.$emit(EVENT_LEAVE);
+        
       },
       addFirst(event) {
-        this.$set(this.food, 'count', 1)
-        this.$emit(EVENT_ADD, event.target)
+         this.$set(this.food,'selectedCount',1)
+         this.$set(this.food.counts[0],'count',1)
+        //this.$emit(EVENT_ADD, event.target)
       },
       //不执行具体的数量加减动作，所有的数量加减均在cart-control.vue addToCart中
       addFood(target) { 
@@ -186,6 +188,13 @@
         width: 100%
         height: 100%
       .back
+        position: absolute
+        top: 10px
+        left: 0
+        img
+          width: 24px
+          height: 24px
+      .back_1
         position: absolute
         top: 10px
         left: 0

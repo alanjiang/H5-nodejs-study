@@ -21,11 +21,13 @@ import {
   ScrollNav,
   ScrollNavBar,
   Toast,
-  ActionSheet
+  ActionSheet,
+  SegmentPicker,
+  Checker
 } from 'cube-ui'
 import VueBus from 'vue-bus';
 import VDistpicker from 'v-distpicker'
-
+Vue.use(Checker)
 Vue.use(Button)
 Vue.use(Input)
 Vue.use(Select)

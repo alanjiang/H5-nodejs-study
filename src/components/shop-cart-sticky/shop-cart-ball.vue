@@ -1,28 +1,23 @@
 <template>
   <div class="shop-cart-sticky" v-show="visible">
     
-    <myCart 
-      ref="shopCart"
+    <myBall 
+      ref="shopBall"
       :selectFoods="selectFoods"
-      :delivery_set="delivery_set"  
-      :min_delivery_price="min_delivery_price" 
-      :max_delivery_distance="max_delivery_distance"
-      :chooseModel="chooseModel"
       :fold="fold"
       :sticky=true
-      :eventstatus="eventstatus"
-      :orderPrice="orderPrice"
+      
     >
-    </myCart>
+    </myBall>
   </div>
 </template>
 
 <script>
-  import myCart from '../shop-cart/MyCart'
+  import myBall from '../shop-cart/MyBall'
   import popupMixin from '../../common/mixins/popup'
 
   export default {
-    name: 'shop-cart-sticky',
+    name: 'shop-cart-ball',
     mixins: [popupMixin],
     props: {
       selectFoods: {
@@ -67,28 +62,17 @@
     
     data () {
       return {
-         count: this.calcCount(this.selectFoods),
-         componetKey: 0,
-         chooseModel: '',
-         eventstatus: 1,
-         orderPrice: 0
+         count: this.calcCount(this.selectFoods)
+         
       } 
     },
     created() {
           this.dropBalls = []
-          
-          
-          
+         
     },
     
     methods: {
-     //reset(this.chooseModel,this.eventstatus, this.orderPrice);
-      reset(v1,v2,v3){
-      
-       this.chooseModel = v1;
-       this.eventstatus= v2;
-       this.orderPrice=v3;
-      },
+    
       calcCount (col){
         var count = 0;
         col.forEach((t)=>{
@@ -97,14 +81,14 @@
         return count;
       },
       drop(el) {
-        this.$refs.shopCart.drop(el)
+        this.$refs.shopBall.drop(el)
       }
     
     },
     
    
     components: {
-      myCart
+      myBall
     }
   }
 </script>
@@ -115,6 +99,6 @@
     left: 0
     bottom: 0
     z-index: 999
-    width: 100%
+    width: 48px
     height: 48px
 </style>

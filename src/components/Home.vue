@@ -22,7 +22,7 @@ export default {
     return {
        goods:[], //Goods.vue 使用 
        member_authen: {}, // dian-header.vue  使用 
-       shop: {} // dian-header.vue 使用 
+       shop: {} // dian-header.vue, Goods.vue 使用 
     }
      
   },
@@ -33,7 +33,14 @@ export default {
             label: '商品',
             component: Goods,
             data:{
-               goods: this.goods
+               goods: this.goods,
+               delivery_set:  this.shop.delivery_set,
+               min_delivery_price: this.shop.min_delivery_price,
+               max_delivery_distance: this.shop.max_delivery_distance,
+               member_authen: this.member_authen
+             
+              
+               
             }
            },
            {
@@ -136,6 +143,8 @@ export default {
               }
               if( result.shop  ){
                   this.shop = result.shop;
+                  this.shop.chooseModel ='到店自取'
+                 
                   localStorage.setItem("shop",JSON.stringify(result.shop));
               }
               

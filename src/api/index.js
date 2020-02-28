@@ -10,6 +10,12 @@ const setDefaultAddress = post('/address/setdefault')
 
 const delAddress = delParam('/address/del')
 
+const makeOrder = post('/newsales/makeOrder')
+
+const getOrderDetail = post('/newsales/getOrderDetail')
+
+
+
 export {
-	getShopMers,getAddresses,updateAddress,setDefaultAddress,delAddress,setGlobal,getGlobal,removeGlobal
+	getOrderDetail,makeOrder,getShopMers,getAddresses,updateAddress,setDefaultAddress,delAddress,setGlobal,getGlobal,removeGlobal
 }

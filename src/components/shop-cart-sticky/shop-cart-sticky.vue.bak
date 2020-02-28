@@ -49,7 +49,11 @@
           return 0
         }
       },
-      
+      chooseModel: {
+         type: String,
+         default: ''
+        
+      },
       fold: {
         type: Boolean,
         default: true
@@ -59,36 +63,38 @@
         default() {
           return {}
         }
+      },
+      eventstatus: {
+         type: Number,
+         default: 1
+        
+      },
+      orderPrice:{
+         type: Number,
+         default: 0
+      
       }
-      
-      
       
     },
     
     data () {
       return {
          count: this.calcCount(this.selectFoods),
-         componetKey: 0,
-         chooseModel: '',
-         eventstatus: 1,
-         orderPrice: 0
+         componetKey: 0
       } 
     },
     created() {
           this.dropBalls = []
+          //from cart-control.vue
           
-          
-          
+          this.$bus.on('synChooseModel', (v) => {
+               alert('MyCartVue receive chooseModel:'+v);
+               this.chooseModel=v;
+           });
     },
     
     methods: {
-     //reset(this.chooseModel,this.eventstatus, this.orderPrice);
-      reset(v1,v2,v3){
-      
-       this.chooseModel = v1;
-       this.eventstatus= v2;
-       this.orderPrice=v3;
-      },
+        
       calcCount (col){
         var count = 0;
         col.forEach((t)=>{

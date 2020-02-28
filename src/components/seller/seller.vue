@@ -46,11 +46,11 @@
         <h1 class="title">商家实景</h1>
         <cube-scroll class="pic-wrapper" :options="picScrollOptions">
           <ul class="pic-list">
-            <li class="pic-item">
-              <img src="http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/114/h/114" width="120" height="90">
+            <li class="pic-item" @click="showBall">
+              <img src="../../assets/dish.jpg" width="120" height="90">
             </li>
              <li class="pic-item">
-              <img src="http://fuss10.elemecdn.com/9/b5/469d8854f9a3a03797933fd01398bjpeg.jpeg?imageView2/1/w/114/h/114" width="120" height="90">
+              <img src="../../assets/dish.jpg" width="120" height="90">
             </li>
           </ul>
          
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-  import { saveToLocal, loadFromLocal } from '../../common/js/storage'
+ 
   import Split from '../split/split'
   import star from '../star/star'
   export default {
@@ -87,7 +87,8 @@
           scrollX: true,
           stopPropagation: true,
           directionLockThreshold: 0
-        }
+        },
+        selectFoods:[]
       }
     },
     
@@ -95,10 +96,22 @@
       toggleFavorite() {
         this.favorite = !this.favorite
         //saveToLocal(this.seller.id, 'favorite', this.favorite)
+      },
+      
+      showBall() {
+      
+          this.shopCartBallComp = this.shopCartBallComp || this.$createShopCartBall({
+          $props: {
+            selectFoods: 'selectFoods',
+            fold: true
+          }
+        })
+        this.shopCartBallComp.show()
+      
       }
+    
     },
     components: {
-      
       Split,star
     }
   }

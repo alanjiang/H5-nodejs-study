@@ -16,3 +16,77 @@
 "dkdc_picture":"key_sub_dkdc/2019082122414228162b01-0abd-4dfb-8020-4e64debaf11e.png","delivery":"1","nature":1,"subid":"1517862861"
 
 }}
+
+
+
+
+
+购物车不被遮挡：
+1, 详情窗口打开，购物车ShopCartSticky打显示
+ selectFood(food) {
+        this.selectedFood = food
+        this._showFood()
+        this._showShopCartSticky()
+      },
+
+
+
+_showFood() {
+        this.foodComp = this.foodComp || this.$createFood({
+          $props: {
+            food: 'selectedFood'
+          },
+          $events: {
+            add: (target) => {
+              this.shopCartStickyComp.drop(target) //小球进来的效果
+            },
+            leave: () => {
+              this._hideShopCartSticky()
+            }
+          }
+        })
+        this.foodComp.show()
+      },
+      _showShopCartSticky() {
+        this.shopCartStickyComp = this.shopCartStickyComp || this.$createShopCartSticky({
+          $props: {
+            selectFoods: 'selectFoods',
+            deliveryPrice: this.seller.deliveryPrice,
+            minPrice: this.seller.minPrice,
+            fold: true
+          }
+        })
+        this.shopCartStickyComp.show()
+      },
+      _hideShopCartSticky() {
+        this.shopCartStickyComp.hide()
+      }
+
+
+
+
+/*********** 商品格式 *****************/
+{"id":2387,"name":"烩面","sort":"汤面类",
+"image":"https://s3.cn-northwest-1.amazonaws.com.cn/dian/merchandise/thumb-73_20181104140002_3ba5b995-331a-487d-a81c-884cb7550233..jpg","price":15.0,"cost_price":0.0,"sales":1200,"no":1,"unit":"份",
+"attrs":[
+
+{"attr_key":"份量","attr_key_en":"fenliang",
+
+"attr_values":[{"attr_id":4696,"attr_value":"大份"},
+{"attr_id":4698,"attr_value":"小份"}]},
+{"attr_key":"加牛肉","attr_key_en":"jianiurou",
+
+"attr_values":[
+{"attr_id":4699,"attr_value":"二两"},
+{"attr_id":4700,"attr_value":"三两"},
+{"attr_id":4701,"attr_value":"四两"}]
+}],"price_span":"0.2-0.36",
+
+"mer_attr_price":[
+
+{"mer_price_id":4702,"label":"份量:大份 加牛肉:二两 ","price":0.2,"cost_price":0.0,"member_price":0.0,"num":999,"symbol":"4696,4699",
+
+"items":[{"id":4696,"attr_key":"份量","attr_key_en":"fenliang","attr_value":"大份","no":1,"adminid":73},
+{"id":4699,"attr_key":"加牛肉","attr_key_en":"jianiurou","attr_value":"二两","no":1,"adminid":73}]},
+{"mer_price_id":4703,"label":"份量:大份 加牛肉:三两 ","price":0.25,"cost_price":0.0,"member_price":0.0,"num":999,"symbol":"4696,4700","items":[{"id":4696,"attr_key":"份量","attr_key_en":"fenliang","attr_value":"大份","no":1,"adminid":73},{"id":4700,"attr_key":"加牛肉","attr_key_en":"jianiurou","attr_value":"三两","no":1,"adminid":73}]},{"mer_price_id":4704,"label":"份量:大份 加牛肉:四两 ","price":0.3,"cost_price":0.0,"member_price":0.0,"num":999,"symbol":"4696,4701","items":[{"id":4696,"attr_key":"份量","attr_key_en":"fenliang","attr_value":"大份","no":1,"adminid":73},{"id":4701,"attr_key":"加牛肉","attr_key_en":"jianiurou","attr_value":"四两","no":1,"adminid":73}]},{"mer_price_id":4708,"label":"份量:小份 加牛肉:二两 ","price":0.26,"cost_price":0.0,"member_price":0.0,"num":999,"symbol":"4698,4699","items":[{"id":4698,"attr_key":"份量","attr_key_en":"fenliang","attr_value":"小份","no":1,"adminid":73},{"id":4699,"attr_key":"加牛肉","attr_key_en":"jianiurou","attr_value":"二两","no":1,"adminid":73}]},{"mer_price_id":4709,"label":"份量:小份 加牛肉:三两 ","price":0.31,"cost_price":0.0,"member_price":0.0,"num":999,"symbol":"4698,4700","items":[{"id":4698,"attr_key":"份量","attr_key_en":"fenliang","attr_value":"小份","no":1,"adminid":73},{"id":4700,"attr_key":"加牛肉","attr_key_en":"jianiurou","attr_value":"三两","no":1,"adminid":73}]},{"mer_price_id":4710,"label":"份量:小份 加牛肉:四两 ","price":0.36,"cost_price":0.0,"member_price":0.0,"num":999,"symbol":"4698,4701","items":[{"id":4698,"attr_key":"份量","attr_key_en":"fenliang","attr_value":"小份","no":1,"adminid":73},{"id":4701,"attr_key":"加牛肉","attr_key_en":"jianiurou","attr_value":"四两","no":1,"adminid":73}]}]},
+

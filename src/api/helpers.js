@@ -1,5 +1,4 @@
 import axios from 'ts-axios-new'
-
 const urlMap = {
   development: '/',
   production: 'https://www.dianliaome.com'
@@ -107,3 +106,9 @@ export function removeGlobal(key){
 	localStorage.removeItem(key)
 
 }
+
+
+
+
+
+

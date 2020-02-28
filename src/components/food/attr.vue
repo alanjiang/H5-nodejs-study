@@ -10,7 +10,7 @@
           <div class="image-header">
             <img :src="food.image">
             <div class="back" @click="hide">
-              <i class="icon-arrow_lift"></i>
+              <img src="../../assets/back.png">
             </div>
           </div> <!-- end of class="image-header" -->
           
@@ -209,7 +209,7 @@
            //数量更新
            this.food.counts[idx].count = this.food.counts[idx].count+1;
            this.food.selectedCount =  this.food.selectedCount+1;
-           
+           this.food.label=this.label;
            this.$emit(EVENT_ADD, target);
            
         
@@ -269,12 +269,13 @@
                   }});
                   if(target != null){
                      var attr_name = this.food.attrs[0].attr_values.find(t=> t.attr_id == this.attr_id1)['attr_value']+':'+ this.food.attrs[1].attr_values.find(t=> t.attr_id == this.attr_id2)['attr_value']; 
-                     
+                    
                      this.price=target.price;
                      this.remain=target.num;
                      this.symbol=target.symbol;
                      this.label = attr_name;
                      this.valid = true;
+                     //alert('=>label:'+attr_name+',symbol:'+this.symbol);
                  }
              }
              
@@ -282,9 +283,7 @@
           } 
           if(this.food.attrs.length == 1){
              
-             var attr_name = this.food.attrs[0].attr_values.find(t=> t.attr_id == this.attr_id1)['attr_value'];
              
-            
              //[{"attr_key":"份量","attr_key_en":"fenliang","attr_values":[{"attr_id":4696,"attr_value":"大份"},{"attr_id":4698,"attr_value":"小份"}]}]
             
              var target=this.food.mer_attr_price.find(item=> {
@@ -295,11 +294,15 @@
             });
              
              if(target != null){
+             
+                  var attr_name = this.food.attrs[0].attr_values.find(t=> t.attr_id == this.attr_id1)['attr_value'];
                   this.price=target.price;
                   this.remain=target.num;
                   this.symbol=target.symbol;
                   this.label = attr_name;
                   this.valid = true;
+                  
+                  //alert('=>label:'+attr_name+',symbol:'+this.symbol);
              }
              
              
@@ -325,6 +328,7 @@
         
         //规格二维点击了
         chooseItem2(index,attr_id){ 
+                    
          this.attr_id2=attr_id;
          this.selected2=index;
          if(this.attr_id1 == null ) return;
@@ -336,9 +340,14 @@
                   return true;
              }});
         if(target != null ){
+        
+           var attr_name = this.food.attrs[0].attr_values.find(t=> t.attr_id == this.attr_id1)['attr_value']+':'+ this.food.attrs[1].attr_values.find(t=> t.attr_id == this.attr_id2)['attr_value']; 
+          
            this.price=target.price;
            this.remain=target.num;
            this.symbol=target.symbol;
+           this.label = attr_name;
+           //alert('=>label:'+attr_name+',symbol:'+this.symbol);
          }  
          this.total_price=this.price*this.count;
        
@@ -425,6 +434,13 @@
         width: 100%
         height: 100%
       .back
+        position: absolute
+        top: 10px
+        left: 0
+        img
+          width: 24px
+          height: 24px
+      .back_1
         position: absolute
         top: 10px
         left: 0

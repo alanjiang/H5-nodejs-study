@@ -9,7 +9,7 @@
       </div>
       <div class="content">
         <div class="title">
-          <span class="brand"></span>
+          
           <span class="name" v-show="shop.shop_name">{{ shop.shop_name }}</span>
         </div>
         <!--
@@ -19,14 +19,21 @@
         -->
         
         <div class="support">
-          
-          <span class="text">扫码点餐、外卖</span>
+          <span class="text" v-if="shop.delivery_set==2 && shop.min_delivery_price">
+              本店支持到店扫码下单、配送 
+          </span>
+          <span class="text" v-else>
+              本店支持扫码下单
+          </span>
         </div>
         
       </div>
     </div>
     <div class="bulletin-wrapper">
-      <span class="bulletin-title"></span><span class="bulletin-text">123</span>
+      <span class="bulletin-title"></span>
+      <span class="bulletin-text">
+        {{ shop.shop_discription }}
+      </span>
       <i class="icon-keyboard_arrow_right"></i>
     </div>
     <div class="background" v-if="shop.objectKey" >
@@ -46,7 +53,7 @@
          
          <span class="my-detail" v-if="member_authen.unionid">我的资料<i class="icon-keyboard_arrow_right" @click.stop="showMe"></i></span>
         
-         <span class="my-detail" v-else>未认证<i class="icon-keyboard_arrow_right" ></i></span>
+         <span class="my-detail" v-else>访客<i class="icon-keyboard_arrow_right" ></i></span>
         
       </div>
   </div>
@@ -74,7 +81,8 @@
 
     methods: {
      showMe(event) {
-        this.$bus.emit('openMe', this.member_authen);
+       //Goods.vue统一打开, order, this.orderFoods,this.data.chooseModel,'mycart'
+        this.$bus.emit('openMe', {},[],'','header');//order: {} 空的对象
       },
       
       showMsg(ms,msg ) {
@@ -90,7 +98,7 @@
      
      created() {
        this.$bus.on('syncHead', (member,shop) => {
-             alert('<=receive from Goods.vue=>');
+             //alert('<=receive from Goods.vue=>');
              this.member_authen = member;
              this.shop = shop;
                 
@@ -105,7 +113,11 @@
   @import "../../common/stylus/variable"
 
   .header
-    position: relative
+    position: fixed
+    left: 0
+    top: 0
+    right: 0
+    width: 100%
     overflow: hidden
     color: $color-white
     background: $color-background-ss
@@ -117,22 +129,20 @@
       .avatar
         flex: 0 0 64px
         width: 64px
-        margin-right: 16px
+        margin-right: 5px
         img
-          border-radius: 2px
+          border-radius: 50%
       .content
         flex: 1
         .title
           display: flex
-          align-items: center
+          align-items: left
           margin-bottom: 8px
-          .brand
-            width: 30px
-            height: 18px
-            bg-image('brand')
-            background-size: 30px 18px
-            background-repeat: no-repeat
+          
           .name
+            height: 30px 
+            max-width:200px
+            overflow: hidden
             margin-left: 6px
             font-size: $fontsize-large
             font-weight: bold
@@ -159,12 +169,11 @@
         width: 60px
         height: 70px
         text-align: center
-        
         .avatar
            width: 45px
            height: 45px
            img
-             border-radius: 15px
+             border-radius: 50%
         .my-detail
           line-height: 12px
           padding: 1px
@@ -196,9 +205,9 @@
       position: relative
       display: flex
       align-items: center
-      height: 28px
-      line-height: 28px
-      padding: 0 8px
+      height: 25px
+      line-height: 25px
+      padding: 0 3px
       background: $color-background-sss
       .bulletin-title
         flex: 0 0 22px
@@ -213,6 +222,10 @@
         white-space: nowrap
         overflow: hidden
         text-overflow: ellipsis
+        font-size: $fontsize-small-s
+      .icon-keyboard_arrow_right
+        flex: 0 0 10px
+        width: 10px
         font-size: $fontsize-small-s
       .icon-keyboard_arrow_right
         flex: 0 0 10px

@@ -36,7 +36,12 @@
     methods: {
       //（+） 加商品到购物车的动作，所有的非规格商品购物车逻辑的唯一入口
       addToCart(event) {
-            
+          //frozen,有定单没有支付，不再允许新增商品至购物车
+          if(this.food.active && this.food.active=='frozen'){
+          
+            this.showMsg(1000,'您目前有定单未处理，请处理定单后再购买')
+            return
+          }
             //将事件冒泡给cart-control-list.vue 组件
             this.$emit(EVENT_ADD, event.target)
             

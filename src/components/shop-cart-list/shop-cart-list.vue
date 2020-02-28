@@ -107,7 +107,7 @@
          var str = '';
          food.counts.forEach((item)=>{
              if(item.count>0){
-              str = str+item.label.split(':')[1]+'x'+item.count+' '
+              str = str+item.label+'x'+item.count+' '
              }
              
          
@@ -158,9 +158,7 @@
                 if(food.haslabel=='yes'){//有规格的商品counts中的数量清空
                     var num = food.counts.length;
                     for (var i=0; i<num; i++){
-                    
                       food.counts[i].count == 0; 
-                    
                     }
                 }
               })

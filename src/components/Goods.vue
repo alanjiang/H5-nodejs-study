@@ -66,7 +66,7 @@
                 
                 
                 <div class="cart-control-wrapper" v-if="food.haslabel=='no'">
-                  <addcart @add="onAdd" :food="food"></addcart>
+                  <addcart @add="onAdd"  :food="food"></addcart>
                 </div>
                  <div class="cart-control-wrapper" v-else>
                    <div class="cartcontrol">
@@ -88,10 +88,17 @@
     </cube-scroll-nav>
   </div>
   
+   <!-- :key="componentKey" -->
    <div class="shop-cart-wrapper">
       <mycart
-        ref="shopCart" :key="componentKey"
-        :selectFoods="selectFoods"> </mycart>
+        ref="shopCart" 
+        :selectFoods="selectFoods" 
+        :delivery_set="delivery_set"  
+        :min_delivery_price="min_delivery_price" 
+        :max_delivery_distance="max_delivery_distance"
+        :chooseModel="chooseModel"
+        :eventstatus="eventstatus"
+        :orderPrice="orderPrice" > </mycart>
     </div>
     
  </div>
@@ -121,7 +128,8 @@ export default {
    
   data () {
     return {
-      // goods:[],
+      
+       order: {},
        selectedFood: {},
        default() {
           return {}
@@ -130,13 +138,41 @@ export default {
           click: false,
           directionLockThreshold: 0
         },
-       shopCartStickyComp: null,
-       componentKey: 0
-      
-    }
+       // start 需要动态变更的数据，props中只存放静态数据
+        orderPrice: 0,
+        chooseModel:'到店自取',
+        eventstatus: 1,
+        orderFoods: [],
+        //end 需要动态变更的数据，props中只存放静态数据
+        componentKey: 0,
+        myComp: undefined,
+        shopCartStickyComp: undefined,
+        foodComp: undefined,
+        attrComp: undefined,
+        shopCartBallComp: undefined
+     }
   },
   
   computed: {
+      // 从 Home.vue绑定过来的属性
+      member_authen () {
+        return this.data.member_authen
+      },
+      delivery_set () {
+      
+        return this.data.delivery_set
+      }, 
+      
+      min_delivery_price () {
+      
+        return this.data.min_delivery_price
+      }, 
+      
+      max_delivery_distance () {
+      
+        return this.data.max_delivery_distance
+      }, 
+    
       goods() { //商品由 Home.vue页面传给子组件 Goods.vue
         return this.data.goods
       },
@@ -184,8 +220,57 @@ export default {
   
   
   methods: {
-  
+    calOrderPrice (orderFoods) {
+           let total = 0
+           orderFoods.forEach((food) => {
+           
+           food.counts.forEach((fd) =>{
+              total += Number((fd.count*fd.price).toFixed(2));
+           });
+          
+           });
+       
+        return total.toFixed(2);
+      },
+    //不允许新增商品 
+    freezeFoods()
+    {
+       this.goods.forEach((good) => {
+           good.items.forEach((food) => { 
+              food.active='frozen'
+          });
+        });
     
+    
+    },
+    
+    unfreezeFoods()
+    {
+       this.goods.forEach((good) => {
+           good.items.forEach((food) => { 
+              food.active='active'
+          });
+        });
+    
+    
+    },
+     //将购物车清空 
+     clearCart () {
+     
+      this.goods.forEach((good) => {
+           good.items.forEach((food) => { 
+             if (food.selectedCount > 0) {
+                
+                food.selectedCount=0;
+                var size = food.counts.length;
+                for(var i=0 ; i< size; i++ ){
+                  food.counts[i].count = 0; 
+                }
+              }
+          });
+        });
+     
+     },
      caclCount(col){
            var count = 0;
            col.forEach((food) => {
@@ -232,88 +317,7 @@ export default {
           this.componentKey += 1;
       },
      
-     
-      
-    // 更新集合[ {'type':'','items':[ {id,name,...count},...{..}]}, ... ]中的items集合对象中的count属性
-    resetFoods(selectedFood){
-    
-         
-          //this.selectedFood = selectedFood;
-        
-          this.goods.forEach(good => {
-          var mers = good.mers;//这个为规格商品的保留项
-          var foods = good.items;
-          var type = good.type
-          var name = good.type
-          //重置good.mers集合中商品的count属性
-          for (var i=0;i<mers.length;i++){
-       
-             if (selectedFood.symbol){ //同步过来的对象
-                    
-                    if (( selectedFood.id ==  mers[i].id ) && (selectedFood.symbol ==  mers[i].symbol) ) 
-                    {
-                         console.log('** symbol='+selectedFood.symbol+',label='+selectedFood.label+' ,更新前数量为:'+mers[i].count);
-                         mers[i].symbol = selectedFood.symbol;
-                         mers[i].label = selectedFood.label;
-                         mers[i].attr_price = selectedFood.attr_price;
-                        if ( mers[i].count){
-                              if(selectedFood.flag == 'add'){
-                                mers[i].count += 1;
-                              }else{
-                                 if(mers[i].count > 0){
-                                     mers[i].count--;
-                                     
-                                 }
-                              }
-                        }else{ //购物车还没有的新规格
-                             mers[i].count = 1;
-                        }
-                        
-                         console.log('** symbol='+selectedFood.symbol+',label='+selectedFood.label+' ,数量更新为:'+mers[i].count);
-                       
-                         break;
-                    }
-                 
-             }else //无规格
-             {
-                   if (selectedFood.id ==  mers[i].id ){
-                      
-                      if (mers[i].count){
-                         mers[i].count = selectedFood.count;
-                      } else {
-                      
-                           mers[i].count =1 ;
-                      }
-                       console.log('** 无规格 id:'+selectedFood.id+','+mers[i].count);  
-                      break;
-                  }
-                 
-             }
-             
-          } // 结束循环 mers 
-          
-           
-            good.mers = mers;
-           
-            
-        });
-        
-         
-        
-          this.resetSelectFoods();
-          //删除集合中数量为0的元素
-          this.selectFoods.splice(this.selectFoods.findIndex(item => item.count == 0), 1);
-     
-          if(this.shopCartStickyComp){
-             this.shopCartStickyComp.update(this.selectFoods);
-          }
-          
-          this.$refs.shopCart.updateSelectFoods(this.selectFoods);
-         
-          this.componentKey++;
-    }, 
-    
-    
+
     _getShopMers(){
        
         getShopMers({
@@ -364,7 +368,7 @@ export default {
                                  item.label = t.label;
                                  item.price = t.price; //用mer_attr_price中的价格
                                  item.symbol = t.symbol;
-                                 m.counts.push({'price':item.price,'label':item.label,'price':item.price,'symbol':item.symbol,'count':0});
+                                 m.counts.push({'price':item.price,'label':item.label,'symbol':item.symbol,'count':0});
                                  
                                });
                            }else{//没有规格的商品
@@ -386,7 +390,7 @@ export default {
               if( result.member_authen  ){
                   this.$emit('syncHead',result.member_authen,result.shop);
                   
-                  alert('==>Goods事件已发出<==');
+                  //alert('==>Goods事件已发出<==');
               }
              
               
@@ -414,13 +418,13 @@ export default {
       selectAttr(food) {
         this.selectedFood = food
         this.showAttr()
-        this.showShopCartSticky()
+        this.showShopCartBall()
       },
       //无规格商品才会使用
       selectFood(food) {
           this.selectedFood = food
           this.showFood()
-          this.showShopCartSticky()
+          this.showShopCartBall()
       },
       //food.vue中的addFoold事件,this.$emit(EVENT_ADD, target)
       //监听 cart-controll.vue中的事件
@@ -428,8 +432,11 @@ export default {
            
          
           this.$refs.shopCart.drop(target)
-        
+         
       },
+      
+      
+      
       showAttr() {
         this.attrComp = this.attrComp || this.$createAttr({
           $props: {
@@ -439,15 +446,13 @@ export default {
           $events: {
             add: (target) => {
               
-              this.shopCartStickyComp.drop(target)
+              this.shopCartBallComp.drop(target)
             },
             leave: (fd) => {
               
-              this.hideShopCartSticky()
-              //this.selectedFood = fd;
+              this.hideShopCartBall()
               // 仅仅让componentKey自增即可解决。
-              
-              this.componentKey++;
+              //this.componentKey++;
             }
           }
         })
@@ -461,71 +466,156 @@ export default {
           },
           $events: {
             add: (target) => {
-              this.shopCartStickyComp.drop(target)
+              this.shopCartBallComp.drop(target)
+              
             },
             leave: () => {
-              this.hideShopCartSticky()
+              this.hideShopCartBall()
             }
           }
         })
         this.foodComp.show()
       },
-      //createAPI
+      /*
       showShopCartSticky() {
         this.shopCartStickyComp = this.shopCartStickyComp || this.$createShopCartSticky({
           $props: {
             selectFoods: 'selectFoods',
-            fold: true
+            fold: true,
+            delivery_set: 'delivery_set',
+            min_delivery_price: 'min_delivery_price',
+            max_delivery_distance: 'max_delivery_distance'
+           
+           
           }
         })
+       
         this.shopCartStickyComp.show()
+       
+       
       },
       hideShopCartSticky() {
         this.shopCartStickyComp.hide()
       },
+      */
       
-      //start 我当前的订单
-      showMe (val) {
+      showShopCartBall() {
+        this.shopCartBallComp = this.shopCartBallComp || this.$createShopCartBall({
+          $props: {
+            selectFoods: 'selectFoods',
+            fold: true
+            
+           
+           
+          }
+        })
+        this.shopCartBallComp.show()
+      },
+      hideShopCartBall() {
+        this.shopCartBallComp.hide()
+      },
       
+     
+      //start 我当前的订单 , //order, this.orderFoods,this.chooseModel,'mycart'
+      showMe (order,orderFoods,chooseModel,flag) {
+      
+     
+       this.closeOtherWin(); //关闭有可能打开的窗口
        this.myComp = this.myComp || this.$createMy({
           $props: {
-            member_authen: val
+             member_authen: this.member_authen,
+             order: this.order,
+             foods: this.orderFoods,
+             chooseModel: this.chooseModel
+   
           },
           $events: {
-            add: (target) => {
-               
-            },
+            
             leave: () => {
-              this.showMsg(1000,'阁下离开中...')
+              
+                this.hideShopCartBall();
             }
           }
         })
         this.myComp.show()
+        
+        this.showShopCartBall();
+        
+       
       
       
-      
-      }
+      },
       
       //end 我当前的订单
+      closeOtherWin () {
       
+         if(this.myComp) // close my.vue
+         {
+          this.myComp.hide()
+          this.myComp = undefined
+         }
+         if(this.shopCartBallComp) //close shop-cart-ball.vue
+         {
+           this.shopCartBallComp.hide()
+           this.shopCartBallComp=undefined
+         }
+         
+         if(this.foodComp) // food.vue
+         {
+            this.foodComp.hide()
+            this.foodComp=undefined
+         }
+        
+         if(this.attrComp) // attr.vue
+         {
+            this.attrComp.hide()
+            this.attrComp=undefined
+         }
+        
+      } //end of 关闭相关窗口
       
    },
    
    created() {
      
-     //this._getShopMers()
+     
       //cart-control-label.vue中的 openAttr事件
       this.$bus.on('openAttr', (val) => {
                
              this.selectAttr(val);
                 
        });
-       
-       this.$bus.on('openMe', (val) => {
+       //order, this.orderFoods,this.chooseModel,'mycart'
+       this.$bus.on('openMe', (v1,v2,v3,v4) => {
+       if (v1.id ){
+          this.order = v1;
+       }
+       if(v2 && v2.length > 0){
+           this.orderFoods = v2
+           this.orderPrice = this.calOrderPrice(v2);
+       }     
+        if(v4 == 'mycart'){ //下了新订单
+                this.eventstatus=2
+                this.clearCart();
+                this.freezeFoods();
                
-             this.showMe(val);
+        } 
+         //打开 my.vue窗口
+         this.showMe(v1,v2,v3,v4);
+        
+  
                 
        });
+       //消费模式选择, MyCart.vue 
+       this.$bus.on('chooseModelChange', (val) => {
+               
+               this.chooseModel = val;
+              
+                
+       });
+       
+       
+      
 
     }
     
@@ -671,6 +761,7 @@ export default {
       z-index: 200
       width: 100%
       height: 48px
+      
       
   
 </style>

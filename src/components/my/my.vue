@@ -4,13 +4,10 @@
     @after-leave="afterLeave"
   >
     <div class="my" v-show="visible">
-    
+  
       <cube-scroll ref="scroll">
-        <div class="my-content">
-         
+        <div class="my-content" >
             <img :src="member_authen.headimgurl" >
-           
-            
             <div class="left">
               <div class="title">
                  {{member_authen.nickname }}
@@ -27,12 +24,24 @@
               <div class="title-small-s">
                   微信用户
               </div>
-            </div>
-          
-         
-        </div>
-        <div class="order">
+            </div> <!-- end of left -->
+        </div> <!-- end of my-content -->
+        
+        <div class="order"> 
+        
+          <!-- start 配送选择 -->
+          <div class="delivery-choose">
+            <cube-checker
+                       v-model="cm"
+                       :options="options"
+                       type="radio" />
+                       
+          </div> 
+          <!-- end 配送选择 -->
         <cube-scroll ref="scroll2">
+         
+         
+         <div v-if="order.id"> <!-- start of 订单呈现 -->
           <div class="caption">
            <span class="order-caption">当前订单号</span> <span class="order-no">2020012009086601</span>
           </div>
@@ -43,74 +52,33 @@
            <span class="line-caption"> 取餐号 </span> <span class="line-no"> 61 </span>
           </div>
            <div class="caption">
-              <span class="status-caption">当前订单状态</span> <span class="status"> 已付款 </span>
+              <span class="status-caption">当前订单状态</span> 
+              <span class="status" v-show="order.order_status == 2"> 已付款 </span>
+              <span class="status" v-show="order.order_status == 1">待付款 </span>
           </div>
           
-          <div class="caption">
+          <div v-for="food in foods">
+          <div class="caption" >
              
               <div class="mer-left">
-                 <img  class="mer-img" src="../../assets/dish.jpg">
+                 <img  class="mer-img" :src="food.image">
                  <span class="mer-detail">
-                  <span class="mer-name">蕃茄炒蛋(大份，有机食品,质量是可靠，放心使用)</span>
-                   <span class="mer-num">数量: 1</span>
+                  <span class="mer-name" v-if="food.label">{{ food.name}} {{ food.label}}</span>
+                  <span class="mer-name" v-else>{{ food.name}}</span>
+                   <span class="mer-num">数量: {{ food.selectedCount }}</span>
                  </span>
               </div>
               <div class="mer-right">
-                 ¥42
+                 ¥ {{ order.total_price }}
               </div> 
               
           </div>
           <div class="split"> </div>
-          <div class="caption">
-             
-              <div class="mer-left">
-                 <img  class="mer-img" src="../../assets/dish.jpg">
-                 <span class="mer-detail">
-                  <span class="mer-name">蕃茄炒蛋(大份，有机食品,质量是可靠，放心使用)</span>
-                   <span class="mer-num">数量: 1</span>
-                 </span>
-              </div>
-              <div class="mer-right">
-                ¥42
-              </div> 
-             
-          </div>
-           <div class="split"> </div>
-          <div class="caption">
-             
-              <div class="mer-left">
-                 <img  class="mer-img" src="../../assets/dish.jpg">
-                 <span class="mer-detail">
-                  <span class="mer-name">蕃茄炒蛋(大份，有机食品,质量是可靠，放心使用)</span>
-                   <span class="mer-num">数量: 1</span>
-                 </span>
-              </div>
-              <div class="mer-right">
-                ¥42
-              </div> 
-              
-          </div>
-          <div class="split"> </div>
-          <div class="caption">
-             
-              <div class="mer-left">
-                 <img  class="mer-img" src="../../assets/dish.jpg">
-                 <span class="mer-detail">
-                  <span class="mer-name">蕃茄炒蛋(大份，有机食品,质量是可靠，放心使用)</span>
-                   <span class="mer-num">数量: 1</span>
-                 </span>
-              </div>
-              <div class="mer-right">
-                ¥6212342.50
-              </div> 
-              
           </div>
           
           <div class="caption-right">
             <span class="total-price">
-             
-               共4份 &nbsp;&nbsp;小计¥235.00
-          
+               共4份 &nbsp;&nbsp;小计¥ {{order.total_price}}
             </span>
           </div>
           
@@ -123,17 +91,27 @@
              
              </span>
           </div>
+        
+         </div> <!-- end of 订单呈现 --> 
+         
+         
+         <div v-else class="no-order">
+            <img src="../../assets/sad.png">
+            
+            <span>您当前还没有新定单 </span>
+         </div>
           
-        </cube-scroll>   
-        </div>
+        </cube-scroll>  
+           
+        </div> <!-- end of order -->
         
         
-      </cube-scroll>
+      </cube-scroll> <!-- end of  ref="scroll", 最外层 scroll -->
         
         <div class="back" @click="hide">
               <i class="icon-arrow_lift"></i>
        </div> 
-    </div>
+    </div> <!-- end of my -->
   </transition>
 </template>
 
@@ -149,12 +127,40 @@
     props: {
       member_authen: {
         type:Object
-      }
+      },
+      
+      //当前订单
+      order: { 
+        type:Object,
+        default() {
+          return {}
+        }
+      },
+      foods: {
+        type: Array,
+        default() {
+          return []
+        }
+      },
+     chooseModel:{
+       type: String,
+       default: '到店自取'
+     }
     },
     
     data() {
       return {
-        message:'Hello dian!'
+        cm: this.chooseModel,
+        options: [
+        {
+          value: '到店自取',
+          text: '到店自取'
+        },
+        {
+          value: '外卖配送',
+          text: '外卖配送'
+        }
+      ]
         
       }
     },
@@ -188,9 +194,7 @@
     top: 0
     bottom: 48px
     width: 100%
-    background-image:url(assets/bg01.jpg)
-    background-repeat: repeat
-    background-position: 0 0
+    background-color: #f6f5ec
     padding:0
     .my-content
        position: absolute
@@ -250,10 +254,22 @@
        right: 0.1em
        top: 180px
        height:380px
-       
        background-color:$color-white
        border-radius: 10px  
        overflow:scroll
+       .delivery-choose
+         position:relative
+         height: 25px
+         padding:3px 3px
+         font-size:$fontsize-large
+       .no-order
+         height: 300px
+         display: flex
+         flex-direction: column
+         justify-content: center
+         align-items: center
+         font-size: 14px
+         color: $color-dark-grey  
        .caption-right
          display: flex
          align-items: flex-end

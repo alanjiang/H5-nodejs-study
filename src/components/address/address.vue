@@ -261,7 +261,7 @@
   .address-list
     height: 100%
     
-    background-color: $coloe-thick-gray
+    background-color: $color-thick-gray
     .overview
       position: relative
       padding: 3px
